@@ -6,11 +6,10 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
 )
 
-var connStr = os.Getenv("REACH_CONN_STR")
-
+// var connStr = os.Getenv("REACH_CONN_STR")
+var connStr = "user=iresharma password=DjP5OMamofu9 dbname=neondb host=ep-yellow-hill-73697354.ap-southeast-1.aws.neon.tech sslmode=verify-full"
 var DB *gorm.DB = nil
 
 type Auth struct {
@@ -71,4 +70,19 @@ func CreateSession(authId string) Session {
 		panic("Something fucked up in session")
 	}
 	return session
+}
+
+func FetchSessionDB(sessionId string) (*map[string]string, *string) {
+	var session Session
+	if err := DB.Preload("Auths").Find(&session, "id = ?", sessionId); err != nil {
+		println(err)
+		resp := "dumb dumb"
+		return nil, &resp
+	}
+	data := map[string]string{
+		"sessionId": sessionId,
+		"authId":    session.AuthId,
+		"perm":      session.Auth.Perm,
+	}
+	return &data, nil
 }

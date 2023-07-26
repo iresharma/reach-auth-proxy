@@ -72,3 +72,9 @@ func HashPass(saltedPass string) string {
 	sha := base64.URLEncoding.EncodeToString(hash.Sum(nil))
 	return sha
 }
+
+// Implementation of this will be completed
+// It'll be the actual proxy setup
+//
+//	sessionValidate => request is duped and forwarded => nothing happens on return
+func Next() {}

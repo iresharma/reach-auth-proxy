@@ -65,16 +65,33 @@ func createSession(c *gin.Context) {
 		DeleteSession(authItem.Id)
 	}
 	session := CreateSession(authItem.Id)
-	AddSessionToCache(authItem.Id, session.Id)
+	AddSessionToCache(authItem.Id, session.Id, authItem.Perm)
 	resp := gin.H{
 		"session": session.Id,
 		"auth":    authItem.Id,
+		"perm":    authItem.Perm,
 	}
 	c.JSON(http.StatusOK, resp)
+}
+
+func validSession(c *gin.Context) {
+	sessionToken := c.Request.Header["X-Session"][0]
+	authId := c.Request.Header["X-Auth"][0]
+	cacheResp, err := FetchSessionCache(sessionToken)
+	if err != nil {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	Next()
 }
 
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
 	r.POST("/user/create", createAuth)
 	r.POST("/session", createSession)
+	r.GET("/session", validSession)
 }

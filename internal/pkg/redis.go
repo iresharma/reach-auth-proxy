@@ -24,9 +24,8 @@ func SessionExists(authId string) bool {
 	} else if err != nil {
 		fmt.Println(err)
 		return false
-	} else {
-		return true
 	}
+	return true
 }
 
 func DeleteSession(authId string) {
@@ -34,10 +33,28 @@ func DeleteSession(authId string) {
 	sessId := Rdb.Get(ctx, authId)
 	_ = Rdb.Del(ctx, authId)
 	_ = Rdb.Del(ctx, sessId.String())
+	_ = Rdb.Del(ctx, sessId.String()+":"+authId)
 }
 
-func AddSessionToCache(authId string, sessionId string) {
+func AddSessionToCache(authId string, sessionId string, perm string) {
 	ctx := context.Background()
 	_ = Rdb.Set(ctx, authId, sessionId, 5*86400*time.Second)
 	_ = Rdb.Set(ctx, sessionId, authId, 5*86400*time.Second)
+	_ = Rdb.Set(ctx, sessionId+":"+authId, perm, 5*86400*time.Second)
+}
+
+func FetchSessionCache(sessionId string) (*map[string]string, *string) {
+	ctx := context.Background()
+	authId, err := Rdb.Get(ctx, sessionId).Result()
+	if err != nil {
+		fmt.Println(err)
+		return FetchSessionDB(sessionId)
+	}
+	perm, err := Rdb.Get(ctx, sessionId+":"+authId).Result()
+	data := map[string]string{
+		"sessionId": sessionId,
+		"authId":    authId,
+		"perm":      perm,
+	}
+	return &data, nil
 }
