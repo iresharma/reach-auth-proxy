@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -61,8 +62,11 @@ func createSession(c *gin.Context) {
 		return
 	}
 	exists := SessionExists(authItem.Id)
+	fmt.Println(exists)
 	if exists {
-		DeleteSession(authItem.Id)
+		fmt.Println("Exists")
+		DeleteSessionCache(authItem.Id)
+		DeleteSessionDB(authItem.Id)
 	}
 	session := CreateSession(authItem.Id)
 	AddSessionToCache(authItem.Id, session.Id, authItem.Perm)
@@ -87,6 +91,7 @@ func validSession(c *gin.Context) {
 		return
 	}
 	Next()
+	c.String(http.StatusOK, "true")
 }
 
 func CreateRoutes(r *gin.Engine) {

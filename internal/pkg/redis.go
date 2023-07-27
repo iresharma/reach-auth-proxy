@@ -19,16 +19,13 @@ func InitRedis() *redis.Client {
 func SessionExists(authId string) bool {
 	ctx := context.Background()
 	_, err := Rdb.Get(ctx, authId).Result()
-	if err != redis.Nil {
-		return false
-	} else if err != nil {
-		fmt.Println(err)
+	if err != nil {
 		return false
 	}
 	return true
 }
 
-func DeleteSession(authId string) {
+func DeleteSessionCache(authId string) {
 	ctx := context.Background()
 	sessId := Rdb.Get(ctx, authId)
 	_ = Rdb.Del(ctx, authId)

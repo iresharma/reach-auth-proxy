@@ -86,3 +86,10 @@ func FetchSessionDB(sessionId string) (*map[string]string, *string) {
 	}
 	return &data, nil
 }
+
+func DeleteSessionDB(authId string) {
+	if err := DB.Delete(&Session{}, "auth_id = ?", authId).Error; err != nil {
+		fmt.Println(err)
+		panic("shit happens")
+	}
+}
