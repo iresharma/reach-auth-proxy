@@ -5,7 +5,7 @@ import (
 )
 
 var validPermissions = []string{
-	"base", "admin", "kanban:read", "kanban:update", "kanban:read", "kanban:delete",
+	"base", "admin", "kanban:read", "kanban:update", "kanban:create", "kanban:delete",
 }
 
 func SortValid() {
