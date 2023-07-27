@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 func statusCheck(c *gin.Context) {
@@ -64,7 +65,6 @@ func createSession(c *gin.Context) {
 	exists := SessionExists(authItem.Id)
 	fmt.Println(exists)
 	if exists {
-		fmt.Println("Exists")
 		DeleteSessionCache(authItem.Id)
 		DeleteSessionDB(authItem.Id)
 	}
@@ -94,9 +94,56 @@ func validSession(c *gin.Context) {
 	c.String(http.StatusOK, "true")
 }
 
+func addPermissions(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.String(http.StatusBadRequest, "Form body not found")
+		return
+	}
+	formData := c.Request.Form
+	user := formData.Get("user")
+	perm := formData.Get("perm")
+	if !ValidPerm(perm) {
+		c.String(http.StatusBadRequest, "Invalid permission:"+perm)
+		return
+	}
+	sessionToken := c.Request.Header["X-Session"][0]
+	authId := c.Request.Header["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	permArr := strings.Split((*cacheResp)["perm"], ";")
+	if !Contains(permArr, "admin") {
+		c.String(http.StatusUnauthorized, "You do not have admin permission")
+		return
+	}
+	// Delete existing sessions to change permissions
+	{
+		DeleteSessionCache(user)
+		DeleteSessionDB(user)
+	}
+	permDb := GetAuthUserFromId(user).Perm
+	if Contains(strings.Split(permDb, ";"), perm) {
+		c.String(http.StatusNotModified, "Permission already exists")
+		return
+	}
+	perm = permDb + perm + ";"
+	UpdateAuthItem(user, perm)
+	c.JSON(http.StatusOK, gin.H{
+		"perm": perm,
+	})
+}
+
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
 	r.POST("/user/create", createAuth)
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
+	r.PUT("/user/perm", addPermissions)
 }

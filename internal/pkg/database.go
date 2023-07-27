@@ -93,3 +93,19 @@ func DeleteSessionDB(authId string) {
 		panic("shit happens")
 	}
 }
+
+func UpdateAuthItem(auth_id string, perm string) {
+	if err := DB.Model(&Auth{}).Where("id = ?", auth_id).Update("perm", perm).Error; err != nil {
+		fmt.Println(err)
+		panic("shit")
+	}
+}
+
+func GetAuthUserFromId(id string) *Auth {
+	auth := Auth{}
+	if err := DB.First(&auth, "id = ?", id).Error; err != nil {
+		fmt.Println("fuck yeah")
+		fmt.Println(err)
+	}
+	return &auth
+}

@@ -10,5 +10,6 @@ func Run() {
 	pkg.CreateRoutes(r)
 	pkg.DB = pkg.CreateConnection()
 	pkg.Rdb = pkg.InitRedis()
+	pkg.SortValid()
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
