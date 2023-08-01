@@ -1,6 +1,7 @@
 package server
 
 import (
+	"awesomeProject/internal/pkg/RPC"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -90,7 +91,6 @@ func validSession(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	Next()
 	c.String(http.StatusOK, "true")
 }
 
@@ -140,10 +140,41 @@ func addPermissions(c *gin.Context) {
 	})
 }
 
+func procedureHandling(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	path := c.Request.URL.Path
+	body := c.Request.Form
+	query := c.Request.URL.Query()
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	permArr := strings.Split((*cacheResp)["perm"], ";")
+	mesasge := RPC.MessageInterface{Name: path, Body: body, Query: query, Headers: headers, Perm: permArr}
+	val, erro := RPC.ProceduresMapping(mesasge)
+	if erro != nil {
+		c.JSON(erro.Status, erro.Message)
+	}
+	c.JSON(http.StatusOK, val)
+}
+
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
 	r.POST("/user/create", createAuth)
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
 	r.PUT("/user/perm", addPermissions)
+	r.Any("*")
 }
