@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        run: node parse-changelog-for-release.js
+      - run: node parse-changelog-for-release.js
       - name: Read release.md
         id: release
         uses: juliangruber/read-file-action@v1
