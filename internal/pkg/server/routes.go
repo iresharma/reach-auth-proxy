@@ -176,5 +176,5 @@ func CreateRoutes(r *gin.Engine) {
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
 	r.PUT("/user/perm", addPermissions)
-	r.Any("*")
+	r.Any("*", procedureHandling)
 }
