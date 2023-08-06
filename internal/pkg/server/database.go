@@ -74,11 +74,12 @@ func CreateSession(authId string) Session {
 
 func FetchSessionDB(sessionId string) (*map[string]string, *string) {
 	var session Session
-	if err := DB.Preload("Auths").Find(&session, "id = ?", sessionId); err != nil {
-		println(err)
-		resp := "dumb dumb"
-		return nil, &resp
+	resp := DB.Joins("Auth").First(&session, "sessions.id = ?", sessionId)
+	if resp.Error != nil {
+		errorString := resp.Error.Error()
+		return nil, &errorString
 	}
+	fmt.Println(session)
 	data := map[string]string{
 		"sessionId": sessionId,
 		"authId":    session.AuthId,

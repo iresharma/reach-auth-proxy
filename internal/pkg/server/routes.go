@@ -2,6 +2,7 @@ package server
 
 import (
 	"awesomeProject/internal/pkg/RPC"
+	types "awesomeProject/internal/pkg/types"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -154,6 +155,7 @@ func procedureHandling(c *gin.Context) {
 	authId := headers["X-Auth"][0]
 	cacheResp, er := FetchSessionCache(sessionToken)
 	if er != nil {
+		fmt.Println(*er)
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
@@ -162,8 +164,8 @@ func procedureHandling(c *gin.Context) {
 		return
 	}
 	permArr := strings.Split((*cacheResp)["perm"], ";")
-	mesasge := RPC.MessageInterface{Name: path, Body: body, Query: query, Headers: headers, Perm: permArr}
-	val, erro := RPC.ProceduresMapping(mesasge)
+	message := types.MessageInterface{Name: path, Body: body, Query: query, Headers: headers, Perm: permArr}
+	val, erro := RPC.ProceduresMapping(message)
 	if erro != nil {
 		c.JSON(erro.Status, erro.Message)
 	}
@@ -176,5 +178,8 @@ func CreateRoutes(r *gin.Engine) {
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
 	r.PUT("/user/perm", addPermissions)
-	r.Any("*", procedureHandling)
+
+	// The wildcard below looks weird but works for all cases like /rpc/kanban. etc
+	// It is used to move communication from rest to rpc
+	r.Any("/rpc/*rpc", procedureHandling)
 }

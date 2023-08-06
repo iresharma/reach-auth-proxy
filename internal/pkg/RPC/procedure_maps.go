@@ -1,27 +1,21 @@
 package RPC
 
-import "fmt"
+import (
+	"awesomeProject/internal/pkg/RPC/kanban"
+	types "awesomeProject/internal/pkg/types"
+	"fmt"
+)
 
-type MessageInterface struct {
-	Name    string
-	Headers map[string][]string
-	Query   map[string][]string
-	Body    map[string][]string
-	Perm    []string
-}
-
-type Error struct {
-	Status  int
-	Message string
-}
-
-func ProceduresMapping(input MessageInterface) (map[string]string, *Error) {
+func ProceduresMapping(input types.MessageInterface) (map[string]interface{}, *types.Error) {
 	switch input.Name {
-	case "hi":
-		fmt.Println("hi procedure in some service would be called")
+	case "/kanban/create":
+		res := kanban.CreateKanban(input)
+		return StructToMap(res), nil
 	default:
 		fmt.Println("everything")
 	}
-	var tempRet = map[string]string{}
-	return tempRet, &Error{}
+	var tempRet = map[string]interface{}{
+		"name": "Iresh",
+	}
+	return tempRet, &types.Error{}
 }
