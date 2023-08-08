@@ -6,19 +6,33 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
 )
 
-// var connStr = os.Getenv("REACH_CONN_STR")
-var connStr = "user=iresharma password=DjP5OMamofu9 dbname=neondb host=ep-yellow-hill-73697354.ap-southeast-1.aws.neon.tech sslmode=verify-full"
+var connStr = os.Getenv("REACH_CONN_STR")
 var DB *gorm.DB = nil
 
 type Auth struct {
 	gorm.Model
-	Id           string `gorm:"primaryKey"`
-	Email        string `gorm:"unique"`
-	PasswordHash string
-	Salt         string
-	Perm         string
+	Id            string `gorm:"primaryKey"`
+	Email         string `gorm:"unique"`
+	PasswordHash  string
+	Salt          string
+	Perm          string
+	UserAccountId string
+}
+
+type UserAccount struct {
+	gorm.Model
+	Id          string `gorm:"primaryKey"`
+	AccountName string
+	Email       string
+	PhotoUrl    string
+	Users       []Auth
+	Owner       string
+	PageId      string
+	BucketId    string
+	BoardId     string
 }
 
 type Session struct {
@@ -28,13 +42,20 @@ type Session struct {
 	Auth   Auth
 }
 
+type UserAccountInviteCode struct {
+	gorm.Model
+	Id            string `gorm:"primaryKey"`
+	Code          string
+	UserAccountId string
+}
+
 func CreateConnection() *gorm.DB {
 	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{TranslateError: true})
 	if err != nil {
 		panic("Cannot connect to database")
 	}
 
-	err = db.AutoMigrate(&Auth{}, &Session{})
+	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{})
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -46,7 +67,7 @@ func CreateConnection() *gorm.DB {
 func CreateAuthItem(email string, passHash string, salt string) (*Auth, *string) {
 	authId := uuid.New()
 	authItem := Auth{Id: authId.String(), Email: email, PasswordHash: passHash, Salt: salt, Perm: "base;"}
-	if err := DB.Create(&authItem).Error; err != nil {
+	if err := DB.Omit("user_account_id").Create(&authItem).Error; err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			resp := "Email already exists"
 			return nil, &resp
@@ -109,4 +130,24 @@ func GetAuthUserFromId(id string) *Auth {
 		fmt.Println(err)
 	}
 	return &auth
+}
+
+func CreateUserAccount(email string, accountName string, userId string) (*UserAccount, *string) {
+	userAccountId := uuid.New()
+	authItem := GetAuthUserFromId(userId)
+	userAccount := UserAccount{
+		Id:          userAccountId.String(),
+		AccountName: accountName,
+		Email:       email,
+		Owner:       userId,
+		Users:       []Auth{*authItem},
+	}
+	if err := DB.Create(&userAccount).Error; err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			resp := "Email already exists"
+			return nil, &resp
+		}
+		panic("Something fucked up")
+	}
+	return &userAccount, nil
 }
