@@ -151,3 +151,31 @@ func CreateUserAccount(email string, accountName string, userId string) (*UserAc
 	}
 	return &userAccount, nil
 }
+
+func GetUserContextWithId(userAccountId string) (*UserAccount, *string) {
+	userAccount := UserAccount{}
+	if err := DB.First(&userAccount, "id = ?", userAccountId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			resp := "User account not found"
+			return nil, &resp
+		}
+		panic(err)
+	}
+	return &userAccount, nil
+}
+
+func CheckUserInUserAccount(userId string, accountID string) bool {
+	userAccount := UserAccount{}
+	if err := DB.Preload("Users").First(&userAccount, "id = ?", accountID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false
+		}
+		panic(err)
+	}
+	for _, user := range userAccount.Users {
+		if user.Id == userId {
+			return true
+		}
+	}
+	return false
+}

@@ -204,10 +204,61 @@ func createUserAccount(c *gin.Context) {
 	})
 }
 
+func getUserAccount(c *gin.Context) {
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	userAccount, er := GetUserContextWithId(headers["X-Useraccount"][0])
+	if er != nil {
+		c.String(http.StatusNotFound, *er)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"userAccount": userAccount,
+	})
+}
+
+func checkUserInUserAccount(c *gin.Context) {
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	user := c.Query("userId")
+	if user == "" {
+		c.String(http.StatusBadRequest, "UserId is a required query param")
+	}
+	userAccount := headers["X-Useraccount"][0]
+	res := CheckUserInUserAccount(user, userAccount)
+	c.JSON(http.StatusOK, gin.H{
+		"res": res,
+	})
+}
+
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
 	r.POST("/user/create", createAuth)
-	r.POST("/userAccount/create", createUserAccount)
+	r.POST("/userAccount", createUserAccount)
+	r.GET("/userAccount", getUserAccount)
+	r.GET("/userAccount/user", checkUserInUserAccount)
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
 	r.PUT("/user/perm", addPermissions)
