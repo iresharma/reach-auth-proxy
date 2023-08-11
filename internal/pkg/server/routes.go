@@ -5,6 +5,7 @@ import (
 	types "awesomeProject/internal/pkg/types"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -67,6 +68,7 @@ func createSession(c *gin.Context) {
 		return
 	}
 	formData := c.Request.Form
+	log.Println(formData)
 	email := formData.Get("email")
 	_, er := EmailValidation(email)
 	if er != nil {
@@ -272,7 +274,7 @@ func checkUserInUserAccount(c *gin.Context) {
 
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
-	r.GET("/user")
+	r.GET("/user", checkEmailExist)
 	r.POST("/user", createAuth)
 	r.POST("/userAccount", createUserAccount)
 	r.GET("/userAccount", getUserAccount)

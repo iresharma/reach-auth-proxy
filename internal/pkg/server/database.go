@@ -6,10 +6,10 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
 )
 
-var connStr = os.Getenv("REACH_CONN_STR")
+// var connStr = os.Getenv("REACH_CONN_STR")
+var connStr = "postgresql://admin:cXCXapUJklmLvp_IXQjn_PY9WvRaag@ap-south-1.354a71b3-ddee-411b-bc8c-ca530e06c464.aws.ybdb.io:5433/yugabyte"
 var DB *gorm.DB = nil
 
 type Auth struct {
