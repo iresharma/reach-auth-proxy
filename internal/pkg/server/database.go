@@ -182,7 +182,7 @@ func CheckUserInUserAccount(userId string, accountID string) bool {
 
 func CheckEmailExists(email string) bool {
 	auth := Auth{}
-	if err := DB.First(&auth, "email = ?", email); err != nil {
+	if err := DB.First(&auth, "email = ?", email).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false
 		}
