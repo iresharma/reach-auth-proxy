@@ -179,3 +179,14 @@ func CheckUserInUserAccount(userId string, accountID string) bool {
 	}
 	return false
 }
+
+func CheckEmailExists(email string) bool {
+	auth := Auth{}
+	if err := DB.First(&auth, "email = ?", email); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false
+		}
+		panic(err)
+	}
+	return true
+}

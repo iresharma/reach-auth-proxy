@@ -43,6 +43,23 @@ func createAuth(c *gin.Context) {
 	c.String(http.StatusCreated, "User created with id:"+user.Id)
 }
 
+func checkEmailExist(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.String(http.StatusBadRequest, "Form body not found")
+		return
+	}
+	formData := c.Request.Form
+	email := formData.Get("email")
+	res := CheckEmailExists(email)
+	if !res {
+		c.JSON(http.StatusNotFound, gin.H{"exists": false})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"exists": true})
+	return
+}
+
 func createSession(c *gin.Context) {
 	err := c.Request.ParseForm()
 	if err != nil {
@@ -255,7 +272,8 @@ func checkUserInUserAccount(c *gin.Context) {
 
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
-	r.POST("/user/create", createAuth)
+	r.GET("/user")
+	r.POST("/user", createAuth)
 	r.POST("/userAccount", createUserAccount)
 	r.GET("/userAccount", getUserAccount)
 	r.GET("/userAccount/user", checkUserInUserAccount)
