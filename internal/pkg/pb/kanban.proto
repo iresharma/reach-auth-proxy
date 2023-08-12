@@ -30,15 +30,11 @@ message UserAccount {
   optional string boardId = 10;
 }
 
-message LabelRequest {
-  string name = 2;
-  string color = 3;
-}
-
 message Label {
   string id = 1;
   string name = 2;
   string color = 3;
+  string boardId = 4;
 }
 
 message Comment {
@@ -77,13 +73,20 @@ message CreateKanbanRequest {
   string UserAccountId = 1;
 }
 
+message LabelRequest {
+  string name = 1;
+  string color = 2;
+  string boardId = 3;
+}
+
 message AddItemRequest {
   string id = 1;
-  Label label = 2;
+  string label = 2;
   STATUS status = 3;
   string title = 4;
   string desc = 5;
   map<string, string> links = 6;
+  string boardId = 7;
 }
 
 message BoardResponse {
