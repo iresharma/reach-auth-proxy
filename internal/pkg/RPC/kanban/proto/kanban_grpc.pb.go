@@ -20,21 +20,23 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	KanbanPackage_InitializeKanban_FullMethodName = "/kanban_package.KanbanPackage/InitializeKanban"
-	KanbanPackage_GetKanban_FullMethodName        = "/kanban_package.KanbanPackage/GetKanban"
+	KanbanPackage_AddLabel_FullMethodName         = "/kanban_package.KanbanPackage/AddLabel"
 	KanbanPackage_AddItem_FullMethodName          = "/kanban_package.KanbanPackage/AddItem"
-	KanbanPackage_UpdateStatus_FullMethodName     = "/kanban_package.KanbanPackage/UpdateStatus"
+	KanbanPackage_GetItems_FullMethodName         = "/kanban_package.KanbanPackage/GetItems"
 	KanbanPackage_UpdateItem_FullMethodName       = "/kanban_package.KanbanPackage/UpdateItem"
+	KanbanPackage_ExportBoard_FullMethodName      = "/kanban_package.KanbanPackage/ExportBoard"
 )
 
 // KanbanPackageClient is the client API for KanbanPackage service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KanbanPackageClient interface {
-	InitializeKanban(ctx context.Context, in *CreateKanbanRequest, opts ...grpc.CallOption) (*UserAccount, error)
-	GetKanban(ctx context.Context, in *GetKanbanRequest, opts ...grpc.CallOption) (*KanbanResponse, error)
-	AddItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*Item, error)
-	UpdateStatus(ctx context.Context, in *UpdateStatusRequest, opts ...grpc.CallOption) (*Item, error)
+	InitializeKanban(ctx context.Context, in *CreateKanbanRequest, opts ...grpc.CallOption) (*BoardResponse, error)
+	AddLabel(ctx context.Context, in *LabelRequest, opts ...grpc.CallOption) (*Label, error)
+	AddItem(ctx context.Context, in *AddItemRequest, opts ...grpc.CallOption) (*Item, error)
+	GetItems(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error)
 	UpdateItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*Item, error)
+	ExportBoard(ctx context.Context, in *BoardResponse, opts ...grpc.CallOption) (*ExportResponse, error)
 }
 
 type kanbanPackageClient struct {
@@ -45,8 +47,8 @@ func NewKanbanPackageClient(cc grpc.ClientConnInterface) KanbanPackageClient {
 	return &kanbanPackageClient{cc}
 }
 
-func (c *kanbanPackageClient) InitializeKanban(ctx context.Context, in *CreateKanbanRequest, opts ...grpc.CallOption) (*UserAccount, error) {
-	out := new(UserAccount)
+func (c *kanbanPackageClient) InitializeKanban(ctx context.Context, in *CreateKanbanRequest, opts ...grpc.CallOption) (*BoardResponse, error) {
+	out := new(BoardResponse)
 	err := c.cc.Invoke(ctx, KanbanPackage_InitializeKanban_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -54,16 +56,16 @@ func (c *kanbanPackageClient) InitializeKanban(ctx context.Context, in *CreateKa
 	return out, nil
 }
 
-func (c *kanbanPackageClient) GetKanban(ctx context.Context, in *GetKanbanRequest, opts ...grpc.CallOption) (*KanbanResponse, error) {
-	out := new(KanbanResponse)
-	err := c.cc.Invoke(ctx, KanbanPackage_GetKanban_FullMethodName, in, out, opts...)
+func (c *kanbanPackageClient) AddLabel(ctx context.Context, in *LabelRequest, opts ...grpc.CallOption) (*Label, error) {
+	out := new(Label)
+	err := c.cc.Invoke(ctx, KanbanPackage_AddLabel_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *kanbanPackageClient) AddItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*Item, error) {
+func (c *kanbanPackageClient) AddItem(ctx context.Context, in *AddItemRequest, opts ...grpc.CallOption) (*Item, error) {
 	out := new(Item)
 	err := c.cc.Invoke(ctx, KanbanPackage_AddItem_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -72,9 +74,9 @@ func (c *kanbanPackageClient) AddItem(ctx context.Context, in *Item, opts ...grp
 	return out, nil
 }
 
-func (c *kanbanPackageClient) UpdateStatus(ctx context.Context, in *UpdateStatusRequest, opts ...grpc.CallOption) (*Item, error) {
-	out := new(Item)
-	err := c.cc.Invoke(ctx, KanbanPackage_UpdateStatus_FullMethodName, in, out, opts...)
+func (c *kanbanPackageClient) GetItems(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error) {
+	out := new(GetItemResponse)
+	err := c.cc.Invoke(ctx, KanbanPackage_GetItems_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,15 +92,25 @@ func (c *kanbanPackageClient) UpdateItem(ctx context.Context, in *Item, opts ...
 	return out, nil
 }
 
+func (c *kanbanPackageClient) ExportBoard(ctx context.Context, in *BoardResponse, opts ...grpc.CallOption) (*ExportResponse, error) {
+	out := new(ExportResponse)
+	err := c.cc.Invoke(ctx, KanbanPackage_ExportBoard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KanbanPackageServer is the server API for KanbanPackage service.
 // All implementations must embed UnimplementedKanbanPackageServer
 // for forward compatibility
 type KanbanPackageServer interface {
-	InitializeKanban(context.Context, *CreateKanbanRequest) (*UserAccount, error)
-	GetKanban(context.Context, *GetKanbanRequest) (*KanbanResponse, error)
-	AddItem(context.Context, *Item) (*Item, error)
-	UpdateStatus(context.Context, *UpdateStatusRequest) (*Item, error)
+	InitializeKanban(context.Context, *CreateKanbanRequest) (*BoardResponse, error)
+	AddLabel(context.Context, *LabelRequest) (*Label, error)
+	AddItem(context.Context, *AddItemRequest) (*Item, error)
+	GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error)
 	UpdateItem(context.Context, *Item) (*Item, error)
+	ExportBoard(context.Context, *BoardResponse) (*ExportResponse, error)
 	mustEmbedUnimplementedKanbanPackageServer()
 }
 
@@ -106,20 +118,23 @@ type KanbanPackageServer interface {
 type UnimplementedKanbanPackageServer struct {
 }
 
-func (UnimplementedKanbanPackageServer) InitializeKanban(context.Context, *CreateKanbanRequest) (*UserAccount, error) {
+func (UnimplementedKanbanPackageServer) InitializeKanban(context.Context, *CreateKanbanRequest) (*BoardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InitializeKanban not implemented")
 }
-func (UnimplementedKanbanPackageServer) GetKanban(context.Context, *GetKanbanRequest) (*KanbanResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetKanban not implemented")
+func (UnimplementedKanbanPackageServer) AddLabel(context.Context, *LabelRequest) (*Label, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddLabel not implemented")
 }
-func (UnimplementedKanbanPackageServer) AddItem(context.Context, *Item) (*Item, error) {
+func (UnimplementedKanbanPackageServer) AddItem(context.Context, *AddItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddItem not implemented")
 }
-func (UnimplementedKanbanPackageServer) UpdateStatus(context.Context, *UpdateStatusRequest) (*Item, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateStatus not implemented")
+func (UnimplementedKanbanPackageServer) GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetItems not implemented")
 }
 func (UnimplementedKanbanPackageServer) UpdateItem(context.Context, *Item) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateItem not implemented")
+}
+func (UnimplementedKanbanPackageServer) ExportBoard(context.Context, *BoardResponse) (*ExportResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExportBoard not implemented")
 }
 func (UnimplementedKanbanPackageServer) mustEmbedUnimplementedKanbanPackageServer() {}
 
@@ -152,26 +167,26 @@ func _KanbanPackage_InitializeKanban_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KanbanPackage_GetKanban_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetKanbanRequest)
+func _KanbanPackage_AddLabel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LabelRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KanbanPackageServer).GetKanban(ctx, in)
+		return srv.(KanbanPackageServer).AddLabel(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: KanbanPackage_GetKanban_FullMethodName,
+		FullMethod: KanbanPackage_AddLabel_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KanbanPackageServer).GetKanban(ctx, req.(*GetKanbanRequest))
+		return srv.(KanbanPackageServer).AddLabel(ctx, req.(*LabelRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KanbanPackage_AddItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Item)
+	in := new(AddItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -183,25 +198,25 @@ func _KanbanPackage_AddItem_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: KanbanPackage_AddItem_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KanbanPackageServer).AddItem(ctx, req.(*Item))
+		return srv.(KanbanPackageServer).AddItem(ctx, req.(*AddItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KanbanPackage_UpdateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateStatusRequest)
+func _KanbanPackage_GetItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KanbanPackageServer).UpdateStatus(ctx, in)
+		return srv.(KanbanPackageServer).GetItems(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: KanbanPackage_UpdateStatus_FullMethodName,
+		FullMethod: KanbanPackage_GetItems_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KanbanPackageServer).UpdateStatus(ctx, req.(*UpdateStatusRequest))
+		return srv.(KanbanPackageServer).GetItems(ctx, req.(*GetItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -224,6 +239,24 @@ func _KanbanPackage_UpdateItem_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KanbanPackage_ExportBoard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BoardResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).ExportBoard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_ExportBoard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).ExportBoard(ctx, req.(*BoardResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KanbanPackage_ServiceDesc is the grpc.ServiceDesc for KanbanPackage service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -236,20 +269,24 @@ var KanbanPackage_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _KanbanPackage_InitializeKanban_Handler,
 		},
 		{
-			MethodName: "GetKanban",
-			Handler:    _KanbanPackage_GetKanban_Handler,
+			MethodName: "AddLabel",
+			Handler:    _KanbanPackage_AddLabel_Handler,
 		},
 		{
 			MethodName: "AddItem",
 			Handler:    _KanbanPackage_AddItem_Handler,
 		},
 		{
-			MethodName: "UpdateStatus",
-			Handler:    _KanbanPackage_UpdateStatus_Handler,
+			MethodName: "GetItems",
+			Handler:    _KanbanPackage_GetItems_Handler,
 		},
 		{
 			MethodName: "UpdateItem",
 			Handler:    _KanbanPackage_UpdateItem_Handler,
+		},
+		{
+			MethodName: "ExportBoard",
+			Handler:    _KanbanPackage_ExportBoard_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -23,7 +23,7 @@ func CreateKanbanClient() (kanbanProto.KanbanPackageClient, *grpc.ClientConn) {
 	return client, kanbanConn
 }
 
-func CreateKanban(messageInterface types.MessageInterface) kanbanProto.UserAccount {
+func CreateKanban(messageInterface types.MessageInterface) kanbanProto.BoardResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()

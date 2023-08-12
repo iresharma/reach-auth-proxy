@@ -7,16 +7,15 @@ option go_package = "./proto";
 package kanban_package;
 
 service KanbanPackage {
-  rpc InitializeKanban(CreateKanbanRequest) returns (UserAccount);
-  rpc GetKanban(GetKanbanRequest) returns (KanbanResponse);
-  rpc AddItem(Item) returns (Item);
-  rpc UpdateStatus(UpdateStatusRequest) returns (Item);
+  rpc InitializeKanban(CreateKanbanRequest) returns (BoardResponse);
+  rpc AddLabel(LabelRequest) returns (Label);
+  rpc AddItem(AddItemRequest) returns (Item);
+  rpc GetItems(GetItemRequest) returns (GetItemResponse);
   rpc UpdateItem(Item) returns (Item);
+  rpc ExportBoard(BoardResponse) returns (ExportResponse);
 }
 
-message CreateKanbanRequest {
-  string UserAccountId = 1;
-}
+// =============== Data Models ==============
 
 message UserAccount {
   string id = 1;
@@ -26,40 +25,81 @@ message UserAccount {
   string photo_url = 5;
   repeated string users = 6;
   string owner = 7;
-  string pageId = 8;
-  string bucketId = 9;
-  string boardId = 10;
+  optional string pageId = 8;
+  optional string bucketId = 9;
+  optional string boardId = 10;
 }
 
-message GetKanbanRequest {
+message LabelRequest {
+  string name = 2;
+  string color = 3;
+}
+
+message Label {
   string id = 1;
+  string name = 2;
+  string color = 3;
+}
+
+message Comment {
+  string id = 1;
+  string userId = 2;
+  string message = 3;
+}
+
+enum STATUS {
+  TODO = 0;
+  PROGRESS = 1;
+  COMPLETED = 2;
+  CANCELED = 3;
+  BACKLOG = 4;
 }
 
 message Item {
-  enum PRIORITY {
-    LOW = 0;
-    MED = 1;
-    HIGH = 2;
-  }
   string id = 1;
-  string title = 2;
-  string description = 3;
-  PRIORITY priority = 4;
-  string script = 5;
-  string reference = 6;
-  string storage = 7;
-  string status = 8;
-  google.protobuf.Timestamp created_at = 9;
-  string boardId = 10;
+  Label label = 2;
+  STATUS status = 3;
+  string title = 4;
+  string desc = 5;
+  map<string, string> links = 6;
+  repeated Comment comments = 7;
 }
 
-message KanbanResponse {
-  string      id = 1;
-  repeated Item  items = 2;
-  string userAccountId = 3;
+message Board {
+  string id = 1;
+  repeated Item items = 2;
+  repeated Label labels = 3;
 }
 
-message UpdateStatusRequest {
+// ============ Request Response ============
+
+message CreateKanbanRequest {
+  string UserAccountId = 1;
+}
+
+message AddItemRequest {
   string id = 1;
-  string status = 2;
+  Label label = 2;
+  STATUS status = 3;
+  string title = 4;
+  string desc = 5;
+  map<string, string> links = 6;
+}
+
+message BoardResponse {
+  string id = 1;
+}
+
+message GetItemRequest {
+  uint32 page = 1;
+  uint32 limit = 2;
+}
+
+message GetItemResponse {
+  repeated Item items = 1;
+  uint32 page = 2;
+}
+
+message ExportResponse {
+  string downloadLink = 1;
 }
