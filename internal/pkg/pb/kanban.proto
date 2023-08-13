@@ -11,7 +11,7 @@ service KanbanPackage {
   rpc AddLabel(LabelRequest) returns (Label);
   rpc AddItem(AddItemRequest) returns (Item);
   rpc GetItems(GetItemRequest) returns (GetItemResponse);
-  rpc UpdateItem(Item) returns (Item);
+  rpc UpdateItem(UpdateItemRequest) returns (Item);
   rpc ExportBoard(BoardResponse) returns (ExportResponse);
 }
 
@@ -105,4 +105,13 @@ message GetItemResponse {
 
 message ExportResponse {
   string downloadLink = 1;
+}
+
+message UpdateItemRequest {
+  string id = 1;
+  optional string label = 2;
+  optional STATUS status = 3;
+  optional string title = 4;
+  optional string desc = 5;
+  map<string, string> links = 6;
 }

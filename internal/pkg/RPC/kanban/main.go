@@ -110,3 +110,93 @@ func AddItem(body url.Values, board string) kanbanProto.Item {
 	}
 	return *res
 }
+
+func GetItem(page int, limit int) kanbanProto.GetItemResponse {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.GetItemRequest{
+		Page:  uint32(page),
+		Limit: uint32(limit),
+	}
+
+	res, err := client.GetItems(ctx, &reqObj)
+	if err != nil {
+		log.Fatalf("Error creating a new label")
+	}
+	return *res
+}
+
+func UpdateItem(vals url.Values) kanbanProto.Item {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.UpdateItemRequest{
+		Id: vals["id"][0],
+	}
+	if label, ok := vals["label"]; ok {
+		reqObj.Label = &label[0]
+	}
+	if status, ok := vals["status"]; ok {
+		switch status[0] {
+		case "todo":
+			statusType := kanbanProto.STATUS_TODO
+			reqObj.Status = &statusType
+			break
+		case "progress":
+			statusType := kanbanProto.STATUS_PROGRESS
+			reqObj.Status = &statusType
+			break
+		case "backlog":
+			statusType := kanbanProto.STATUS_BACKLOG
+			reqObj.Status = &statusType
+			break
+		case "completed":
+			statusType := kanbanProto.STATUS_COMPLETED
+			reqObj.Status = &statusType
+			break
+		case "cancelled":
+			statusType := kanbanProto.STATUS_CANCELED
+			reqObj.Status = &statusType
+			break
+		}
+	}
+	if title, ok := vals["title"]; ok {
+		reqObj.Title = &title[0]
+	}
+	if desc, ok := vals["desc"]; ok {
+		reqObj.Desc = &desc[0]
+	}
+	if links, ok := vals["links"]; ok {
+		var linksJson map[string]string
+		json.Unmarshal([]byte(links[0]), &linksJson)
+		reqObj.Links = linksJson
+	}
+
+	res, err := client.UpdateItem(ctx, &reqObj)
+	if err != nil {
+		log.Fatalf("Blah blah")
+	}
+	return *res
+}
+
+func ExportBoard(boardId string) kanbanProto.ExportResponse {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObjcet := kanbanProto.BoardResponse{
+		Id: boardId,
+	}
+
+	res, err := client.ExportBoard(ctx, &reqObjcet)
+	if err != nil {
+		log.Fatalf("blah blah")
+	}
+	return *res
+}

@@ -35,7 +35,7 @@ type KanbanPackageClient interface {
 	AddLabel(ctx context.Context, in *LabelRequest, opts ...grpc.CallOption) (*Label, error)
 	AddItem(ctx context.Context, in *AddItemRequest, opts ...grpc.CallOption) (*Item, error)
 	GetItems(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error)
-	UpdateItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*Item, error)
+	UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	ExportBoard(ctx context.Context, in *BoardResponse, opts ...grpc.CallOption) (*ExportResponse, error)
 }
 
@@ -83,7 +83,7 @@ func (c *kanbanPackageClient) GetItems(ctx context.Context, in *GetItemRequest, 
 	return out, nil
 }
 
-func (c *kanbanPackageClient) UpdateItem(ctx context.Context, in *Item, opts ...grpc.CallOption) (*Item, error) {
+func (c *kanbanPackageClient) UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error) {
 	out := new(Item)
 	err := c.cc.Invoke(ctx, KanbanPackage_UpdateItem_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -109,7 +109,7 @@ type KanbanPackageServer interface {
 	AddLabel(context.Context, *LabelRequest) (*Label, error)
 	AddItem(context.Context, *AddItemRequest) (*Item, error)
 	GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error)
-	UpdateItem(context.Context, *Item) (*Item, error)
+	UpdateItem(context.Context, *UpdateItemRequest) (*Item, error)
 	ExportBoard(context.Context, *BoardResponse) (*ExportResponse, error)
 	mustEmbedUnimplementedKanbanPackageServer()
 }
@@ -130,7 +130,7 @@ func (UnimplementedKanbanPackageServer) AddItem(context.Context, *AddItemRequest
 func (UnimplementedKanbanPackageServer) GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetItems not implemented")
 }
-func (UnimplementedKanbanPackageServer) UpdateItem(context.Context, *Item) (*Item, error) {
+func (UnimplementedKanbanPackageServer) UpdateItem(context.Context, *UpdateItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateItem not implemented")
 }
 func (UnimplementedKanbanPackageServer) ExportBoard(context.Context, *BoardResponse) (*ExportResponse, error) {
@@ -222,7 +222,7 @@ func _KanbanPackage_GetItems_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _KanbanPackage_UpdateItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Item)
+	in := new(UpdateItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -234,7 +234,7 @@ func _KanbanPackage_UpdateItem_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: KanbanPackage_UpdateItem_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KanbanPackageServer).UpdateItem(ctx, req.(*Item))
+		return srv.(KanbanPackageServer).UpdateItem(ctx, req.(*UpdateItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

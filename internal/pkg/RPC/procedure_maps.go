@@ -4,6 +4,7 @@ import (
 	"awesomeProject/internal/pkg/RPC/kanban"
 	types "awesomeProject/internal/pkg/types"
 	"fmt"
+	"strconv"
 )
 
 func ProceduresMapping(input types.MessageInterface) (map[string]interface{}, *types.Error) {
@@ -22,7 +23,25 @@ func ProceduresMapping(input types.MessageInterface) (map[string]interface{}, *t
 		board := input.Query["board"][0]
 		res := kanban.AddItem(input.Body, board)
 		return StructToMap(res), nil
-
+	case "/kanban/item":
+		pageStr := input.Query["page"][0]
+		limitStr := input.Query["limit"][0]
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			panic(err)
+		}
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			panic(err)
+		}
+		res := kanban.GetItem(page, limit)
+		return StructToMap(res), nil
+	case "/kanban/item/update":
+		res := kanban.UpdateItem(input.Body)
+		return StructToMap(res), nil
+	case "/kanban/export":
+		res := kanban.ExportBoard(input.Query["boardId"][0])
+		return StructToMap(res), nil
 	default:
 		fmt.Println("everything")
 	}
