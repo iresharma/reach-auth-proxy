@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	KanbanDomain = "localhost:4000"
+	KanbanDomain = "localhost:4040"
 )
 
 func CreateKanbanClient() (kanbanProto.KanbanPackageClient, *grpc.ClientConn) {
