@@ -167,8 +167,9 @@ func procedureHandling(c *gin.Context) {
 		return
 	}
 	path := c.Request.URL.Path
-	body := c.Request.Form
 	query := c.Request.URL.Query()
+	bodyString := c.Request.Form.Encode()
+	body := RPC.BodyToMap(bodyString)
 	headers := c.Request.Header
 	sessionToken := headers["X-Session"][0]
 	authId := headers["X-Auth"][0]
@@ -183,7 +184,7 @@ func procedureHandling(c *gin.Context) {
 		return
 	}
 	permArr := strings.Split((*cacheResp)["perm"], ";")
-	message := types.MessageInterface{Name: path, Body: body, Query: query, Headers: headers, Perm: permArr}
+	message := types.MessageInterface{Name: path, Body: body, Query: query, Headers: headers, Perm: permArr, Method: c.Request.Method}
 	val, erro := RPC.ProceduresMapping(message)
 	if erro != nil {
 		c.JSON(erro.Status, erro.Message)
