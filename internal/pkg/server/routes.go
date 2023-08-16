@@ -2,11 +2,12 @@ package server
 
 import (
 	"awesomeProject/internal/pkg/RPC"
-	types "awesomeProject/internal/pkg/types"
+	"awesomeProject/internal/pkg/RPC/kanban"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -160,38 +161,6 @@ func addPermissions(c *gin.Context) {
 	})
 }
 
-func procedureHandling(c *gin.Context) {
-	err := c.Request.ParseForm()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
-		return
-	}
-	path := c.Request.URL.Path
-	query := c.Request.URL.Query()
-	bodyString := c.Request.Form.Encode()
-	body := RPC.BodyToMap(bodyString)
-	headers := c.Request.Header
-	sessionToken := headers["X-Session"][0]
-	authId := headers["X-Auth"][0]
-	cacheResp, er := FetchSessionCache(sessionToken)
-	if er != nil {
-		fmt.Println(*er)
-		c.String(http.StatusUnauthorized, "Not Allowed")
-		return
-	}
-	if (*cacheResp)["authId"] != authId {
-		c.String(http.StatusUnauthorized, "Not Allowed")
-		return
-	}
-	permArr := strings.Split((*cacheResp)["perm"], ";")
-	message := types.MessageInterface{Name: path, Body: body, Query: query, Headers: headers, Perm: permArr, Method: c.Request.Method}
-	val, erro := RPC.ProceduresMapping(message)
-	if erro != nil {
-		c.JSON(erro.Status, erro.Message)
-	}
-	c.JSON(http.StatusOK, val)
-}
-
 func createUserAccount(c *gin.Context) {
 	err := c.Request.ParseForm()
 	if err != nil {
@@ -273,6 +242,166 @@ func checkUserInUserAccount(c *gin.Context) {
 	})
 }
 
+// =====-----------Kanban-----------=====
+
+func createKanban(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	userAccount := headers["X-Useraccount"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	//permArr := strings.Split((*cacheResp)["perm"], ";")
+	res := kanban.CreateKanban(userAccount)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
+func createLabel(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	//permArr := strings.Split((*cacheResp)["perm"], ";")
+	body := c.Request.Form
+	fmt.Println(body)
+	res := kanban.AddLabel(body.Get("board"), body.Get("color"), body.Get("label"))
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
+func createItem(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	//permArr := strings.Split((*cacheResp)["perm"], ";")
+	body := c.Request.Form
+	board := headers["X-Board"][0]
+	res := kanban.AddItem(body, board)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
+func getItems(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	pageStr := c.Query("page")
+	limitStr := c.Query("limit")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		panic(err)
+	}
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		panic(err)
+	}
+	res := kanban.GetItem(page, limit)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
+func updateItem(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	body := c.Request.Form
+	res := kanban.UpdateItem(body)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
+func exportKanban(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	boardId := headers["X-Board"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	res := kanban.ExportBoard(boardId)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
 	r.GET("/user", checkEmailExist)
@@ -283,8 +412,10 @@ func CreateRoutes(r *gin.Engine) {
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
 	r.PUT("/user/perm", addPermissions)
-
-	// The wildcard below looks weird but works for all cases like /rpc/kanban. etc
-	// It is used to move communication from rest to rpc
-	r.Any("/rpc/*rpc", procedureHandling)
+	r.POST("/kanban", createKanban)
+	r.POST("/kanban/label", createLabel)
+	r.POST("/kanban/item", createItem)
+	r.GET("/kanban/item", getItems)
+	r.PATCH("/kanban/item", updateItem)
+	r.GET("/kanban/export", exportKanban)
 }

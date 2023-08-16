@@ -80,13 +80,12 @@ message LabelRequest {
 }
 
 message AddItemRequest {
-  string id = 1;
-  string label = 2;
-  STATUS status = 3;
-  string title = 4;
-  string desc = 5;
-  map<string, string> links = 6;
-  string boardId = 7;
+  string label = 1;
+  STATUS status = 2;
+  string title = 3;
+  string desc = 4;
+  map<string, string> links = 5;
+  string boardId = 6;
 }
 
 message BoardResponse {

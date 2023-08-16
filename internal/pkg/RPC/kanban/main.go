@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"net/url"
 	"time"
 )
 
@@ -62,16 +62,15 @@ func AddLabel(boardId string, color string, label string) kanbanProto.Label {
 	return *res
 }
 
-func AddItem(body map[string]string, board string) kanbanProto.Item {
+func AddItem(body url.Values, board string) kanbanProto.Item {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
 
-	id := uuid.New()
 	var status kanbanProto.STATUS
 
-	switch body["status"] {
+	switch body.Get("status") {
 	case "todo":
 		status = kanbanProto.STATUS_TODO
 		break
@@ -90,24 +89,30 @@ func AddItem(body map[string]string, board string) kanbanProto.Item {
 	}
 
 	var links map[string]string
-	err := json.Unmarshal([]byte(body["links"]), &links)
+	decodeVal, err := url.QueryUnescape(body.Get("links"))
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	fmt.Println(decodeVal)
+	err = json.Unmarshal([]byte(decodeVal), &links)
 	if err != nil {
 		panic(err)
 	}
 
 	reqObj := kanbanProto.AddItemRequest{
-		Id:      id.String(),
-		Label:   body["label"],
+		Label:   body.Get("label"),
 		Status:  status,
-		Title:   body["title"],
-		Desc:    body["desc"],
+		Title:   body.Get("title"),
+		Desc:    body.Get("desc"),
 		Links:   links,
 		BoardId: board,
 	}
 
 	res, err := client.AddItem(ctx, &reqObj)
 	if err != nil {
-		log.Fatalf("Error creating a new label")
+		fmt.Println(err)
+		log.Fatalf("Error creating a new Item")
 	}
 	return *res
 }
@@ -125,25 +130,25 @@ func GetItem(page int, limit int) kanbanProto.GetItemResponse {
 
 	res, err := client.GetItems(ctx, &reqObj)
 	if err != nil {
-		log.Fatalf("Error creating a new label")
+		log.Fatalf("Error getting items")
 	}
 	return *res
 }
 
-func UpdateItem(vals map[string]string) kanbanProto.Item {
+func UpdateItem(vals url.Values) kanbanProto.Item {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
 
 	reqObj := kanbanProto.UpdateItemRequest{
-		Id: vals["id"],
+		Id: vals.Get("id"),
 	}
 	if label, ok := vals["label"]; ok {
-		reqObj.Label = &label
+		reqObj.Label = &label[0]
 	}
 	if status, ok := vals["status"]; ok {
-		switch status {
+		switch status[0] {
 		case "todo":
 			statusType := kanbanProto.STATUS_TODO
 			reqObj.Status = &statusType
@@ -167,14 +172,14 @@ func UpdateItem(vals map[string]string) kanbanProto.Item {
 		}
 	}
 	if title, ok := vals["title"]; ok {
-		reqObj.Title = &title
+		reqObj.Title = &title[0]
 	}
 	if desc, ok := vals["desc"]; ok {
-		reqObj.Desc = &desc
+		reqObj.Desc = &desc[0]
 	}
 	if links, ok := vals["links"]; ok {
 		var linksJson map[string]string
-		json.Unmarshal([]byte(links), &linksJson)
+		json.Unmarshal([]byte(links[0]), &linksJson)
 		reqObj.Links = linksJson
 	}
 
