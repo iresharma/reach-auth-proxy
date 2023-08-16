@@ -1,0 +1,400 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "contact": {},
+    "description": "Api endpoints for all services in the reach system",
+    "title": "Reach Apis",
+    "version": "1.0.0"
+  },
+  "basePath": "localhost",
+  "paths": {
+    "/kanban": {
+      "post": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-UserAccount",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kanban"
+        ],
+        "description": "Create Kanban board",
+        "operationId": "createKanbanBoard",
+        "summary": "Create Kanban board"
+      }
+    },
+    "/kanban/item": {
+      "post": {
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-UserAccount",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Board",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "desc",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "label",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "links",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "title",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kanban"
+        ],
+        "description": "Create kanban Item",
+        "operationId": "createKanbanItem",
+        "summary": "Create kanban Item"
+      }
+    },
+    "/kanban/label": {
+      "post": {
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-UserAccount",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "board",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "color",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "label",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kanban"
+        ],
+        "description": "create label",
+        "operationId": "createLabel",
+        "summary": "create label"
+      }
+    },
+    "/rpc/rpc/kanban/bang": {
+      "get": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "test endpoint (IGNORE)",
+        "operationId": "testEndpointIgnore",
+        "summary": "test endpoint (IGNORE)"
+      }
+    },
+    "/session": {
+      "get": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "Session Validate",
+        "operationId": "sessionValidate",
+        "summary": "Session Validate"
+      },
+      "post": {
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "password",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "create session",
+        "operationId": "createSession",
+        "summary": "create session"
+      }
+    },
+    "/user": {
+      "post": {
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "password",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "Create Auth Item",
+        "operationId": "createAuthItem",
+        "summary": "Create Auth Item"
+      }
+    },
+    "/user/perm": {
+      "put": {
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "perm",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "user",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "Add perm",
+        "operationId": "addPerm",
+        "summary": "Add perm"
+      }
+    },
+    "/userAccount": {
+      "get": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-UserAccount",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "Get User Account",
+        "operationId": "getUserAccount",
+        "summary": "Get User Account"
+      },
+      "post": {
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "account_name",
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "email",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "Create User Account",
+        "operationId": "createUserAccount",
+        "summary": "Create User Account"
+      }
+    },
+    "/userAccount/user": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-UserAccount",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Session",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "X-Auth",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "User in user account",
+        "operationId": "userInUserAccount",
+        "summary": "User in user account"
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Apis related to Kanban service",
+      "name": "Kanban"
+    }
+  ]
+}
