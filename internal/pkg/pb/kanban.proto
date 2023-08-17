@@ -57,7 +57,7 @@ message Item {
   STATUS status = 3;
   string title = 4;
   string desc = 5;
-  map<string, string> links = 6;
+  string links = 6;
   repeated Comment comments = 7;
 }
 
@@ -95,6 +95,7 @@ message BoardResponse {
 message GetItemRequest {
   uint32 page = 1;
   uint32 limit = 2;
+  string board = 3;
 }
 
 message GetItemResponse {
@@ -112,5 +113,5 @@ message UpdateItemRequest {
   optional STATUS status = 3;
   optional string title = 4;
   optional string desc = 5;
-  map<string, string> links = 6;
+  string links = 6;
 }

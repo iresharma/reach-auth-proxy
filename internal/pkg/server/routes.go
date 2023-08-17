@@ -340,8 +340,9 @@ func getItems(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	pageStr := c.Query("page")
-	limitStr := c.Query("limit")
+	pageStr, _ := c.GetQuery("page")
+	limitStr, _ := c.GetQuery("limit")
+	fmt.Println(pageStr)
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		panic(err)

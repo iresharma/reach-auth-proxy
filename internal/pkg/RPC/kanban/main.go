@@ -178,9 +178,7 @@ func UpdateItem(vals url.Values) kanbanProto.Item {
 		reqObj.Desc = &desc[0]
 	}
 	if links, ok := vals["links"]; ok {
-		var linksJson map[string]string
-		json.Unmarshal([]byte(links[0]), &linksJson)
-		reqObj.Links = linksJson
+		reqObj.Links = links[0]
 	}
 
 	res, err := client.UpdateItem(ctx, &reqObj)
