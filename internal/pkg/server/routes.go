@@ -193,6 +193,24 @@ func createUserAccount(c *gin.Context) {
 	})
 }
 
+func getUserAccountForUser(c *gin.Context) {
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	userAccount := GetUserAccountFromUser(authId)
+	c.JSON(http.StatusOK, gin.H{"userAccount": userAccount})
+}
+
 func getUserAccount(c *gin.Context) {
 	headers := c.Request.Header
 	sessionToken := headers["X-Session"][0]
@@ -330,6 +348,7 @@ func getItems(c *gin.Context) {
 	headers := c.Request.Header
 	sessionToken := headers["X-Session"][0]
 	authId := headers["X-Auth"][0]
+	boardId := headers["X-Board"][0]
 	cacheResp, er := FetchSessionCache(sessionToken)
 	if er != nil {
 		fmt.Println(*er)
@@ -342,7 +361,6 @@ func getItems(c *gin.Context) {
 	}
 	pageStr, _ := c.GetQuery("page")
 	limitStr, _ := c.GetQuery("limit")
-	fmt.Println(pageStr)
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		panic(err)
@@ -351,7 +369,7 @@ func getItems(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	res := kanban.GetItem(page, limit)
+	res := kanban.GetItem(page, limit, boardId)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -407,6 +425,7 @@ func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
 	r.GET("/user", checkEmailExist)
 	r.POST("/user", createAuth)
+	r.GET("/user/userAccount", getUserAccountForUser)
 	r.POST("/userAccount", createUserAccount)
 	r.GET("/userAccount", getUserAccount)
 	r.GET("/userAccount/user", checkUserInUserAccount)

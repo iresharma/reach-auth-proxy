@@ -190,3 +190,15 @@ func CheckEmailExists(email string) bool {
 	}
 	return true
 }
+
+func GetUserAccountFromUser(authId string) UserAccount {
+	auth := Auth{}
+	if err := DB.First(&auth, "id = ?", authId).Error; err != nil {
+		panic(err)
+	}
+	userAccount := UserAccount{}
+	if err := DB.First(&userAccount, "id = ?", auth.UserAccountId).Error; err != nil {
+		panic(err)
+	}
+	return userAccount
+}

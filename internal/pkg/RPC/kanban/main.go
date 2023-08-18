@@ -117,7 +117,7 @@ func AddItem(body url.Values, board string) kanbanProto.Item {
 	return *res
 }
 
-func GetItem(page int, limit int) kanbanProto.GetItemResponse {
+func GetItem(page int, limit int, boardId string) kanbanProto.GetItemResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -126,10 +126,12 @@ func GetItem(page int, limit int) kanbanProto.GetItemResponse {
 	reqObj := kanbanProto.GetItemRequest{
 		Page:  uint32(page),
 		Limit: uint32(limit),
+		Board: boardId,
 	}
 
 	res, err := client.GetItems(ctx, &reqObj)
 	if err != nil {
+		log.Fatalf(err.Error())
 		log.Fatalf("Error getting items")
 	}
 	return *res
