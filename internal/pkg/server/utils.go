@@ -3,10 +3,18 @@ package server
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"math/rand"
+	"net/http"
 	"regexp"
 	"unicode"
 )
+
+type SessionValidateResponse struct {
+	HttpStatus *int
+	Response   *string
+	Perm       *string
+}
 
 func EmailValidation(email string) (*bool, *string) {
 	ret := false
@@ -71,4 +79,30 @@ func HashPass(saltedPass string) string {
 	hash.Write([]byte(saltedPass))
 	sha := base64.URLEncoding.EncodeToString(hash.Sum(nil))
 	return sha
+}
+
+func ValidateSession(request *http.Request) SessionValidateResponse {
+	headers := request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		resp := "Not Allowed"
+		httpStatus := http.StatusUnauthorized
+		return SessionValidateResponse{
+			HttpStatus: &httpStatus,
+			Response:   &resp,
+		}
+	}
+	if (*cacheResp)["authId"] != authId {
+		resp := "Not Allowed"
+		httpStatus := http.StatusUnauthorized
+		return SessionValidateResponse{
+			HttpStatus: &httpStatus,
+			Response:   &resp,
+		}
+	}
+	perm := (*cacheResp)["Perm"]
+	return SessionValidateResponse{Perm: &perm}
 }

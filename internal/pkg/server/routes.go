@@ -103,6 +103,7 @@ func createSession(c *gin.Context) {
 func validSession(c *gin.Context) {
 	sessionToken := c.Request.Header["X-Session"][0]
 	authId := c.Request.Header["X-Auth"][0]
+	fmt.Println(sessionToken, authId)
 	cacheResp, err := FetchSessionCache(sessionToken)
 	if err != nil {
 		c.String(http.StatusUnauthorized, "Not Allowed")
@@ -167,23 +168,16 @@ func createUserAccount(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
 		return
 	}
-	headers := c.Request.Header
-	sessionToken := headers["X-Session"][0]
-	authId := headers["X-Auth"][0]
-	cacheResp, er := FetchSessionCache(sessionToken)
-	if er != nil {
-		fmt.Println(*er)
-		c.String(http.StatusUnauthorized, "Not Allowed")
-		return
-	}
-	if (*cacheResp)["authId"] != authId {
-		c.String(http.StatusUnauthorized, "Not Allowed")
+	request := c.Request
+	sessionResponse := ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
 		return
 	}
 	body := c.Request.Form
 	email := body.Get("email")
 	accountName := body.Get("account_name")
-	user, erro := CreateUserAccount(email, accountName, authId)
+	user, erro := CreateUserAccount(email, accountName, request.Header["X-Auth"][0])
 	if erro != nil {
 		c.String(http.StatusInternalServerError, *erro)
 		return
@@ -194,38 +188,24 @@ func createUserAccount(c *gin.Context) {
 }
 
 func getUserAccountForUser(c *gin.Context) {
-	headers := c.Request.Header
-	sessionToken := headers["X-Session"][0]
-	authId := headers["X-Auth"][0]
-	cacheResp, er := FetchSessionCache(sessionToken)
-	if er != nil {
-		fmt.Println(*er)
-		c.String(http.StatusUnauthorized, "Not Allowed")
+	request := c.Request
+	sessionResponse := ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
 		return
 	}
-	if (*cacheResp)["authId"] != authId {
-		c.String(http.StatusUnauthorized, "Not Allowed")
-		return
-	}
-	userAccount := GetUserAccountFromUser(authId)
+	userAccount := GetUserAccountFromUser(request.Header["X-Auth"][0])
 	c.JSON(http.StatusOK, gin.H{"userAccount": userAccount})
 }
 
 func getUserAccount(c *gin.Context) {
-	headers := c.Request.Header
-	sessionToken := headers["X-Session"][0]
-	authId := headers["X-Auth"][0]
-	cacheResp, er := FetchSessionCache(sessionToken)
-	if er != nil {
-		fmt.Println(*er)
-		c.String(http.StatusUnauthorized, "Not Allowed")
+	request := c.Request
+	sessionResponse := ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
 		return
 	}
-	if (*cacheResp)["authId"] != authId {
-		c.String(http.StatusUnauthorized, "Not Allowed")
-		return
-	}
-	userAccount, er := GetUserContextWithId(headers["X-Useraccount"][0])
+	userAccount, er := GetUserContextWithId(request.Header["X-Useraccount"][0])
 	if er != nil {
 		c.String(http.StatusNotFound, *er)
 		return
@@ -236,24 +216,17 @@ func getUserAccount(c *gin.Context) {
 }
 
 func checkUserInUserAccount(c *gin.Context) {
-	headers := c.Request.Header
-	sessionToken := headers["X-Session"][0]
-	authId := headers["X-Auth"][0]
-	cacheResp, er := FetchSessionCache(sessionToken)
-	if er != nil {
-		fmt.Println(*er)
-		c.String(http.StatusUnauthorized, "Not Allowed")
-		return
-	}
-	if (*cacheResp)["authId"] != authId {
-		c.String(http.StatusUnauthorized, "Not Allowed")
+	request := c.Request
+	sessionResponse := ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
 		return
 	}
 	user := c.Query("userId")
 	if user == "" {
 		c.String(http.StatusBadRequest, "UserId is a required query param")
 	}
-	userAccount := headers["X-Useraccount"][0]
+	userAccount := request.Header["X-Useraccount"][0]
 	res := CheckUserInUserAccount(user, userAccount)
 	c.JSON(http.StatusOK, gin.H{
 		"res": res,
@@ -423,15 +396,19 @@ func exportKanban(c *gin.Context) {
 
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
+	// User endpoints
 	r.GET("/user", checkEmailExist)
 	r.POST("/user", createAuth)
-	r.GET("/user/userAccount", getUserAccountForUser)
+	r.PUT("/user/perm", addPermissions)
+	// User Account endpoints
 	r.POST("/userAccount", createUserAccount)
 	r.GET("/userAccount", getUserAccount)
+	r.GET("/user/userAccount", getUserAccountForUser)
 	r.GET("/userAccount/user", checkUserInUserAccount)
+	// Session endpoints
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
-	r.PUT("/user/perm", addPermissions)
+	// Kanban endpoints
 	r.POST("/kanban", createKanban)
 	r.POST("/kanban/label", createLabel)
 	r.POST("/kanban/item", createItem)

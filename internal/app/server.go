@@ -9,7 +9,7 @@ import (
 func Run() {
 	r := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowHeaders = []string{"X-Auth", "X-Session", "X-UserAccount"}
+	config.AllowHeaders = []string{"X-Auth", "X-Session", "X-UserAccount", "X-Board"}
 	config.AllowAllOrigins = true
 	r.Use(cors.New(config))
 	server.CreateRoutes(r)
