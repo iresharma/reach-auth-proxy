@@ -175,9 +175,8 @@ func createUserAccount(c *gin.Context) {
 		return
 	}
 	body := c.Request.Form
-	email := body.Get("email")
 	accountName := body.Get("account_name")
-	user, erro := CreateUserAccount(email, accountName, request.Header["X-Auth"][0])
+	user, erro := CreateUserAccount(accountName, request.Header["X-Auth"][0])
 	if erro != nil {
 		c.String(http.StatusInternalServerError, *erro)
 		return

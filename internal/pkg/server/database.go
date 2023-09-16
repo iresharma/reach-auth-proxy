@@ -131,13 +131,13 @@ func GetAuthUserFromId(id string) *Auth {
 	return &auth
 }
 
-func CreateUserAccount(email string, accountName string, userId string) (*UserAccount, *string) {
+func CreateUserAccount(accountName string, userId string) (*UserAccount, *string) {
 	userAccountId := uuid.New()
 	authItem := GetAuthUserFromId(userId)
 	userAccount := UserAccount{
 		Id:          userAccountId.String(),
 		AccountName: accountName,
-		Email:       email,
+		Email:       authItem.Email,
 		Owner:       userId,
 		Users:       []Auth{*authItem},
 	}
