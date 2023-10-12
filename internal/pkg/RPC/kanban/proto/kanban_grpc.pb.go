@@ -21,9 +21,16 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	KanbanPackage_InitializeKanban_FullMethodName = "/kanban_package.KanbanPackage/InitializeKanban"
 	KanbanPackage_AddLabel_FullMethodName         = "/kanban_package.KanbanPackage/AddLabel"
+	KanbanPackage_GetLabels_FullMethodName        = "/kanban_package.KanbanPackage/GetLabels"
+	KanbanPackage_GetLabel_FullMethodName         = "/kanban_package.KanbanPackage/GetLabel"
 	KanbanPackage_AddItem_FullMethodName          = "/kanban_package.KanbanPackage/AddItem"
 	KanbanPackage_GetItems_FullMethodName         = "/kanban_package.KanbanPackage/GetItems"
 	KanbanPackage_UpdateItem_FullMethodName       = "/kanban_package.KanbanPackage/UpdateItem"
+	KanbanPackage_AddComment_FullMethodName       = "/kanban_package.KanbanPackage/AddComment"
+	KanbanPackage_UpdateComment_FullMethodName    = "/kanban_package.KanbanPackage/UpdateComment"
+	KanbanPackage_DeleteComment_FullMethodName    = "/kanban_package.KanbanPackage/DeleteComment"
+	KanbanPackage_AddReaction_FullMethodName      = "/kanban_package.KanbanPackage/AddReaction"
+	KanbanPackage_DeleteReaction_FullMethodName   = "/kanban_package.KanbanPackage/DeleteReaction"
 	KanbanPackage_ExportBoard_FullMethodName      = "/kanban_package.KanbanPackage/ExportBoard"
 )
 
@@ -33,9 +40,16 @@ const (
 type KanbanPackageClient interface {
 	InitializeKanban(ctx context.Context, in *CreateKanbanRequest, opts ...grpc.CallOption) (*BoardResponse, error)
 	AddLabel(ctx context.Context, in *LabelRequest, opts ...grpc.CallOption) (*Label, error)
+	GetLabels(ctx context.Context, in *BoardResponse, opts ...grpc.CallOption) (*GetLabelsResponse, error)
+	GetLabel(ctx context.Context, in *GetLabelRequest, opts ...grpc.CallOption) (*Label, error)
 	AddItem(ctx context.Context, in *AddItemRequest, opts ...grpc.CallOption) (*Item, error)
 	GetItems(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error)
 	UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
+	AddComment(ctx context.Context, in *CommentRequest, opts ...grpc.CallOption) (*Comment, error)
+	UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*Comment, error)
+	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*VoidResp, error)
+	AddReaction(ctx context.Context, in *AddReactionRequest, opts ...grpc.CallOption) (*VoidResp, error)
+	DeleteReaction(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*VoidResp, error)
 	ExportBoard(ctx context.Context, in *BoardResponse, opts ...grpc.CallOption) (*ExportResponse, error)
 }
 
@@ -59,6 +73,24 @@ func (c *kanbanPackageClient) InitializeKanban(ctx context.Context, in *CreateKa
 func (c *kanbanPackageClient) AddLabel(ctx context.Context, in *LabelRequest, opts ...grpc.CallOption) (*Label, error) {
 	out := new(Label)
 	err := c.cc.Invoke(ctx, KanbanPackage_AddLabel_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kanbanPackageClient) GetLabels(ctx context.Context, in *BoardResponse, opts ...grpc.CallOption) (*GetLabelsResponse, error) {
+	out := new(GetLabelsResponse)
+	err := c.cc.Invoke(ctx, KanbanPackage_GetLabels_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kanbanPackageClient) GetLabel(ctx context.Context, in *GetLabelRequest, opts ...grpc.CallOption) (*Label, error) {
+	out := new(Label)
+	err := c.cc.Invoke(ctx, KanbanPackage_GetLabel_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +124,51 @@ func (c *kanbanPackageClient) UpdateItem(ctx context.Context, in *UpdateItemRequ
 	return out, nil
 }
 
+func (c *kanbanPackageClient) AddComment(ctx context.Context, in *CommentRequest, opts ...grpc.CallOption) (*Comment, error) {
+	out := new(Comment)
+	err := c.cc.Invoke(ctx, KanbanPackage_AddComment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kanbanPackageClient) UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*Comment, error) {
+	out := new(Comment)
+	err := c.cc.Invoke(ctx, KanbanPackage_UpdateComment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kanbanPackageClient) DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*VoidResp, error) {
+	out := new(VoidResp)
+	err := c.cc.Invoke(ctx, KanbanPackage_DeleteComment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kanbanPackageClient) AddReaction(ctx context.Context, in *AddReactionRequest, opts ...grpc.CallOption) (*VoidResp, error) {
+	out := new(VoidResp)
+	err := c.cc.Invoke(ctx, KanbanPackage_AddReaction_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kanbanPackageClient) DeleteReaction(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*VoidResp, error) {
+	out := new(VoidResp)
+	err := c.cc.Invoke(ctx, KanbanPackage_DeleteReaction_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *kanbanPackageClient) ExportBoard(ctx context.Context, in *BoardResponse, opts ...grpc.CallOption) (*ExportResponse, error) {
 	out := new(ExportResponse)
 	err := c.cc.Invoke(ctx, KanbanPackage_ExportBoard_FullMethodName, in, out, opts...)
@@ -107,9 +184,16 @@ func (c *kanbanPackageClient) ExportBoard(ctx context.Context, in *BoardResponse
 type KanbanPackageServer interface {
 	InitializeKanban(context.Context, *CreateKanbanRequest) (*BoardResponse, error)
 	AddLabel(context.Context, *LabelRequest) (*Label, error)
+	GetLabels(context.Context, *BoardResponse) (*GetLabelsResponse, error)
+	GetLabel(context.Context, *GetLabelRequest) (*Label, error)
 	AddItem(context.Context, *AddItemRequest) (*Item, error)
 	GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error)
 	UpdateItem(context.Context, *UpdateItemRequest) (*Item, error)
+	AddComment(context.Context, *CommentRequest) (*Comment, error)
+	UpdateComment(context.Context, *UpdateCommentRequest) (*Comment, error)
+	DeleteComment(context.Context, *DeleteCommentRequest) (*VoidResp, error)
+	AddReaction(context.Context, *AddReactionRequest) (*VoidResp, error)
+	DeleteReaction(context.Context, *DeleteReactionRequest) (*VoidResp, error)
 	ExportBoard(context.Context, *BoardResponse) (*ExportResponse, error)
 	mustEmbedUnimplementedKanbanPackageServer()
 }
@@ -124,6 +208,12 @@ func (UnimplementedKanbanPackageServer) InitializeKanban(context.Context, *Creat
 func (UnimplementedKanbanPackageServer) AddLabel(context.Context, *LabelRequest) (*Label, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddLabel not implemented")
 }
+func (UnimplementedKanbanPackageServer) GetLabels(context.Context, *BoardResponse) (*GetLabelsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLabels not implemented")
+}
+func (UnimplementedKanbanPackageServer) GetLabel(context.Context, *GetLabelRequest) (*Label, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLabel not implemented")
+}
 func (UnimplementedKanbanPackageServer) AddItem(context.Context, *AddItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddItem not implemented")
 }
@@ -132,6 +222,21 @@ func (UnimplementedKanbanPackageServer) GetItems(context.Context, *GetItemReques
 }
 func (UnimplementedKanbanPackageServer) UpdateItem(context.Context, *UpdateItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateItem not implemented")
+}
+func (UnimplementedKanbanPackageServer) AddComment(context.Context, *CommentRequest) (*Comment, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
+}
+func (UnimplementedKanbanPackageServer) UpdateComment(context.Context, *UpdateCommentRequest) (*Comment, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateComment not implemented")
+}
+func (UnimplementedKanbanPackageServer) DeleteComment(context.Context, *DeleteCommentRequest) (*VoidResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
+}
+func (UnimplementedKanbanPackageServer) AddReaction(context.Context, *AddReactionRequest) (*VoidResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddReaction not implemented")
+}
+func (UnimplementedKanbanPackageServer) DeleteReaction(context.Context, *DeleteReactionRequest) (*VoidResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteReaction not implemented")
 }
 func (UnimplementedKanbanPackageServer) ExportBoard(context.Context, *BoardResponse) (*ExportResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExportBoard not implemented")
@@ -181,6 +286,42 @@ func _KanbanPackage_AddLabel_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KanbanPackageServer).AddLabel(ctx, req.(*LabelRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KanbanPackage_GetLabels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BoardResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).GetLabels(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_GetLabels_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).GetLabels(ctx, req.(*BoardResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KanbanPackage_GetLabel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLabelRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).GetLabel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_GetLabel_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).GetLabel(ctx, req.(*GetLabelRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -239,6 +380,96 @@ func _KanbanPackage_UpdateItem_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KanbanPackage_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).AddComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_AddComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).AddComment(ctx, req.(*CommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KanbanPackage_UpdateComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).UpdateComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_UpdateComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).UpdateComment(ctx, req.(*UpdateCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KanbanPackage_DeleteComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).DeleteComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_DeleteComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).DeleteComment(ctx, req.(*DeleteCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KanbanPackage_AddReaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddReactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).AddReaction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_AddReaction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).AddReaction(ctx, req.(*AddReactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KanbanPackage_DeleteReaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).DeleteReaction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_DeleteReaction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).DeleteReaction(ctx, req.(*DeleteReactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _KanbanPackage_ExportBoard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BoardResponse)
 	if err := dec(in); err != nil {
@@ -273,6 +504,14 @@ var KanbanPackage_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _KanbanPackage_AddLabel_Handler,
 		},
 		{
+			MethodName: "GetLabels",
+			Handler:    _KanbanPackage_GetLabels_Handler,
+		},
+		{
+			MethodName: "GetLabel",
+			Handler:    _KanbanPackage_GetLabel_Handler,
+		},
+		{
 			MethodName: "AddItem",
 			Handler:    _KanbanPackage_AddItem_Handler,
 		},
@@ -283,6 +522,26 @@ var KanbanPackage_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateItem",
 			Handler:    _KanbanPackage_UpdateItem_Handler,
+		},
+		{
+			MethodName: "AddComment",
+			Handler:    _KanbanPackage_AddComment_Handler,
+		},
+		{
+			MethodName: "UpdateComment",
+			Handler:    _KanbanPackage_UpdateComment_Handler,
+		},
+		{
+			MethodName: "DeleteComment",
+			Handler:    _KanbanPackage_DeleteComment_Handler,
+		},
+		{
+			MethodName: "AddReaction",
+			Handler:    _KanbanPackage_AddReaction_Handler,
+		},
+		{
+			MethodName: "DeleteReaction",
+			Handler:    _KanbanPackage_DeleteReaction_Handler,
 		},
 		{
 			MethodName: "ExportBoard",

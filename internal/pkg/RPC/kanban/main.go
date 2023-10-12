@@ -182,10 +182,10 @@ func UpdateItem(vals url.Values) kanbanProto.Item {
 	if links, ok := vals["links"]; ok {
 		reqObj.Links = links[0]
 	}
-
 	res, err := client.UpdateItem(ctx, &reqObj)
 	if err != nil {
-		log.Fatalf("Blah blah")
+		fmt.Println(err)
+		log.Println("Blah blah")
 	}
 	return *res
 }
@@ -202,7 +202,8 @@ func ExportBoard(boardId string) kanbanProto.ExportResponse {
 
 	res, err := client.ExportBoard(ctx, &reqObjcet)
 	if err != nil {
-		log.Fatalf("blah blah")
+		log.Println(err)
+		log.Println("blah blah")
 	}
 	return *res
 }

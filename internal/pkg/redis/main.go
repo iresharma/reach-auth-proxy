@@ -1,6 +1,7 @@
-package server
+package redis
 
 import (
+	database "awesomeProject/internal/pkg/database"
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
@@ -45,7 +46,7 @@ func FetchSessionCache(sessionId string) (*map[string]string, *string) {
 	authId, err := Rdb.Get(ctx, sessionId).Result()
 	if err != nil {
 		fmt.Println(err)
-		return FetchSessionDB(sessionId)
+		return database.FetchSessionDB(sessionId)
 	}
 	perm, err := Rdb.Get(ctx, sessionId+":"+authId).Result()
 	data := map[string]string{

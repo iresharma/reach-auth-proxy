@@ -1,6 +1,7 @@
-package server
+package utils
 
 import (
+	redis "awesomeProject/internal/pkg/redis"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -85,7 +86,7 @@ func ValidateSession(request *http.Request) SessionValidateResponse {
 	headers := request.Header
 	sessionToken := headers["X-Session"][0]
 	authId := headers["X-Auth"][0]
-	cacheResp, er := FetchSessionCache(sessionToken)
+	cacheResp, er := redis.FetchSessionCache(sessionToken)
 	if er != nil {
 		fmt.Println(*er)
 		resp := "Not Allowed"

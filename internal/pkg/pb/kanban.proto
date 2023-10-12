@@ -9,9 +9,16 @@ package kanban_package;
 service KanbanPackage {
   rpc InitializeKanban(CreateKanbanRequest) returns (BoardResponse);
   rpc AddLabel(LabelRequest) returns (Label);
+  rpc GetLabels(BoardResponse) returns (GetLabelsResponse);
+  rpc GetLabel(GetLabelRequest) returns (Label);
   rpc AddItem(AddItemRequest) returns (Item);
   rpc GetItems(GetItemRequest) returns (GetItemResponse);
   rpc UpdateItem(UpdateItemRequest) returns (Item);
+  rpc AddComment(CommentRequest) returns (Comment);
+  rpc UpdateComment(UpdateCommentRequest) returns (Comment);
+  rpc DeleteComment(DeleteCommentRequest) returns (VoidResp);
+  rpc AddReaction(AddReactionRequest) returns (VoidResp);
+  rpc DeleteReaction(DeleteReactionRequest) returns (VoidResp);
   rpc ExportBoard(BoardResponse) returns (ExportResponse);
 }
 
@@ -41,6 +48,13 @@ message Comment {
   string id = 1;
   string userId = 2;
   string message = 3;
+  repeated Reaction reactions = 4;
+}
+
+message Reaction {
+  string id = 1;
+  string userId = 3;
+  string emoji = 2;
 }
 
 enum STATUS {
@@ -59,6 +73,7 @@ message Item {
   string desc = 5;
   string links = 6;
   repeated Comment comments = 7;
+  string userId = 8;
 }
 
 message Board {
@@ -86,6 +101,7 @@ message AddItemRequest {
   string desc = 4;
   map<string, string> links = 5;
   string boardId = 6;
+  string userId = 7;
 }
 
 message BoardResponse {
@@ -115,3 +131,38 @@ message UpdateItemRequest {
   optional string desc = 5;
   string links = 6;
 }
+
+message CommentRequest {
+  string ItemId = 1;
+  string message = 2;
+  string userId  = 3;
+}
+
+message UpdateCommentRequest {
+  string id = 1;
+  string message = 2;
+}
+
+message DeleteCommentRequest {
+  string id = 1;
+}
+
+message AddReactionRequest {
+  string userId = 1;
+  string commentId = 3;
+  string emoji = 2;
+};
+
+message DeleteReactionRequest {
+  string id = 1;
+}
+
+message GetLabelsResponse {
+  repeated Label labels = 1;
+}
+
+message GetLabelRequest {
+  string labelId = 1;
+}
+
+message VoidResp {}

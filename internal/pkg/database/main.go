@@ -1,4 +1,4 @@
-package server
+package database
 
 import (
 	"errors"
@@ -200,4 +200,12 @@ func GetUserAccountFromUser(authId string) UserAccount {
 		panic(err)
 	}
 	return userAccount
+}
+
+func GetKanban(userAccountId string) string {
+	var boardId string
+	if err := DB.Raw("select board_id from user_accounts where id = '" + userAccountId + "'").Scan(&boardId); err != nil {
+		panic(err)
+	}
+	return boardId
 }
