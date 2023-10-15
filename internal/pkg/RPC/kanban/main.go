@@ -112,7 +112,42 @@ func AddItem(body url.Values, board string) kanbanProto.Item {
 	res, err := client.AddItem(ctx, &reqObj)
 	if err != nil {
 		fmt.Println(err)
-		log.Fatalf("Error creating a new Item")
+		log.Println("Error creating a new Item")
+	}
+	return *res
+}
+
+func GetLabels(board_id string) kanbanProto.GetLabelsResponse {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.BoardResponse{
+		Id: board_id,
+	}
+	res, err := client.GetLabels(ctx, &reqObj)
+	if err != nil {
+		fmt.Println(err)
+		log.Println("Error getting labels")
+	}
+	return *res
+}
+
+func Getlabel(label_id string) kanbanProto.Label {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.GetLabelRequest{
+		LabelId: label_id,
+	}
+
+	res, err := client.GetLabel(ctx, &reqObj)
+	if err != nil {
+		fmt.Println(err)
+		log.Println("Error getting label" + label_id)
 	}
 	return *res
 }
@@ -204,6 +239,63 @@ func ExportBoard(boardId string) kanbanProto.ExportResponse {
 	if err != nil {
 		log.Println(err)
 		log.Println("blah blah")
+	}
+	return *res
+}
+
+func AddComment(message string, itemId string, userId string) kanbanProto.Comment {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.CommentRequest{
+		Message: message,
+		ItemId:  itemId,
+		UserId:  userId,
+	}
+
+	res, err := client.AddComment(ctx, &reqObj)
+	if err != nil {
+		log.Println(err)
+		log.Println("Error while creating comment")
+	}
+	return *res
+}
+
+func UpdateComment(message string, commentId string) kanbanProto.Comment {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.UpdateCommentRequest{
+		Id:      commentId,
+		Message: message,
+	}
+
+	res, err := client.UpdateComment(ctx, &reqObj)
+	if err != nil {
+		log.Println(err)
+		log.Println("Error while creating comment")
+	}
+	return *res
+}
+
+func DeleteComment(id string) kanbanProto.VoidResp {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.DeleteCommentRequest{
+		Id: id,
+	}
+
+	res, err := client.DeleteComment(ctx, &reqObj)
+	if err != nil {
+		log.Println(err)
+		log.Println("Error while creating comment")
 	}
 	return *res
 }
