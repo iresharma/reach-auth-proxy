@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package page_package;
+
+service PagePackage {
+  rpc GetPage(IdRequest) returns (Page);
+  rpc CreatePage(PageRequest) returns (Page);
+  rpc CreateTemplate(TemplateRequest) returns (Template);
+  rpc UpdateTemplate(IdResponse) returns (VoidResponse);
+  rpc CreateLink(CreateLinkRequest) returns (PageLinks);
+  rpc UpdateLink(PageLinks) returns (VoidResponse);
+  rpc CreateMetaLink(Meta) returns (Meta);
+  rpc UpdateMetaLink(Meta) returns (VoidResponse);
+}
+
+// Database objects
+
+message Page {
+  string Id = 1;
+  string Route = 2;
+  Template Template = 3;
+  string UserAccountId = 4;
+  repeated PageLinks Links = 5;
+}
+
+message Template {
+  string Id = 1;
+  string Name = 2;
+  string Desc = 3;
+  string Image = 4;
+  string Button = 5;
+  string Background = 6;
+  string Font = 7;
+  string FontColor = 8;
+  repeated Meta MetaTags = 9;
+  string PageId = 10;
+  bool Social = 11;
+  string SocialPosition = 12;
+}
+
+message Meta {
+  string Id = 1;
+  string Value = 2;
+  string Type = 3;
+  string TemplateId = 4;
+}
+
+message PageLinks {
+  string Id = 1;
+  string Name = 2;
+  string Link = 3;
+  string Icon = 4;
+  bool Social = 5;
+  string PageId = 6;
+}
+
+// Requests
+
+message IdRequest {
+  string id = 1;
+}
+
+message PageRequest {
+  string Route = 1;
+  string UserAccountId = 2;
+}
+
+message TemplateRequest {
+  string Name = 1;
+  string Desc = 2;
+  string Image = 3;
+  string Button = 4;
+  string Background = 5;
+  string Font = 6;
+  string FontColor = 7;
+  string PageId = 8;
+  bool Social = 9;
+  string SocialPosition = 10;
+}
+
+message CreateLinkRequest {
+  string Name = 1;
+  string Link = 2;
+  string Icon = 3;
+  bool IsSocialIcon = 4;
+  string pageId = 5;
+}
+
+// Responses
+
+message IdResponse {
+  string id = 1;
+}
+
+message VoidResponse {}
