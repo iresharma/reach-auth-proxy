@@ -152,7 +152,7 @@ func Getlabel(label_id string) kanbanProto.Label {
 	return *res
 }
 
-func GetItem(page int, limit int, boardId string) kanbanProto.GetItemResponse {
+func GetItems(page int, limit int, boardId string) kanbanProto.GetItemResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -165,6 +165,24 @@ func GetItem(page int, limit int, boardId string) kanbanProto.GetItemResponse {
 	}
 
 	res, err := client.GetItems(ctx, &reqObj)
+	if err != nil {
+		log.Fatalf(err.Error())
+		log.Fatalf("Error getting items")
+	}
+	return *res
+}
+
+func GetItem(task_id string) kanbanProto.Item {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObj := kanbanProto.DeleteReactionRequest{
+		Id: task_id,
+	}
+
+	res, err := client.GetItem(ctx, &reqObj)
 	if err != nil {
 		log.Fatalf(err.Error())
 		log.Fatalf("Error getting items")

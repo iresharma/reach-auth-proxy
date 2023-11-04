@@ -8,6 +8,7 @@ import (
 	"awesomeProject/internal/pkg/server/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -129,7 +130,19 @@ func getItems(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	res := kanban.GetItem(page, limit, boardId)
+	res := kanban.GetItems(page, limit, boardId)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
+func getItem(c *gin.Context) {
+	request := c.Request
+	sessionResponse := utils.ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
+		return
+	}
+	task_id := c.Query("id")
+	res := kanban.GetItem(task_id)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -193,6 +206,7 @@ func AddComment(c *gin.Context) {
 	userId := request.Header.Get("X-Auth")
 	itemId := c.Query("item_id")
 	body := request.Form
+	log.Println(body.Get("message"))
 	res := kanban.AddComment(body.Get("message"), itemId, userId)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }

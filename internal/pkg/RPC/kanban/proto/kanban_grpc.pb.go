@@ -25,6 +25,7 @@ const (
 	KanbanPackage_GetLabel_FullMethodName         = "/kanban_package.KanbanPackage/GetLabel"
 	KanbanPackage_AddItem_FullMethodName          = "/kanban_package.KanbanPackage/AddItem"
 	KanbanPackage_GetItems_FullMethodName         = "/kanban_package.KanbanPackage/GetItems"
+	KanbanPackage_GetItem_FullMethodName          = "/kanban_package.KanbanPackage/GetItem"
 	KanbanPackage_UpdateItem_FullMethodName       = "/kanban_package.KanbanPackage/UpdateItem"
 	KanbanPackage_AddComment_FullMethodName       = "/kanban_package.KanbanPackage/AddComment"
 	KanbanPackage_UpdateComment_FullMethodName    = "/kanban_package.KanbanPackage/UpdateComment"
@@ -44,6 +45,7 @@ type KanbanPackageClient interface {
 	GetLabel(ctx context.Context, in *GetLabelRequest, opts ...grpc.CallOption) (*Label, error)
 	AddItem(ctx context.Context, in *AddItemRequest, opts ...grpc.CallOption) (*Item, error)
 	GetItems(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error)
+	GetItem(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*Item, error)
 	UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
 	AddComment(ctx context.Context, in *CommentRequest, opts ...grpc.CallOption) (*Comment, error)
 	UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*Comment, error)
@@ -109,6 +111,15 @@ func (c *kanbanPackageClient) AddItem(ctx context.Context, in *AddItemRequest, o
 func (c *kanbanPackageClient) GetItems(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error) {
 	out := new(GetItemResponse)
 	err := c.cc.Invoke(ctx, KanbanPackage_GetItems_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kanbanPackageClient) GetItem(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*Item, error) {
+	out := new(Item)
+	err := c.cc.Invoke(ctx, KanbanPackage_GetItem_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -188,6 +199,7 @@ type KanbanPackageServer interface {
 	GetLabel(context.Context, *GetLabelRequest) (*Label, error)
 	AddItem(context.Context, *AddItemRequest) (*Item, error)
 	GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error)
+	GetItem(context.Context, *DeleteReactionRequest) (*Item, error)
 	UpdateItem(context.Context, *UpdateItemRequest) (*Item, error)
 	AddComment(context.Context, *CommentRequest) (*Comment, error)
 	UpdateComment(context.Context, *UpdateCommentRequest) (*Comment, error)
@@ -219,6 +231,9 @@ func (UnimplementedKanbanPackageServer) AddItem(context.Context, *AddItemRequest
 }
 func (UnimplementedKanbanPackageServer) GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetItems not implemented")
+}
+func (UnimplementedKanbanPackageServer) GetItem(context.Context, *DeleteReactionRequest) (*Item, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetItem not implemented")
 }
 func (UnimplementedKanbanPackageServer) UpdateItem(context.Context, *UpdateItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateItem not implemented")
@@ -358,6 +373,24 @@ func _KanbanPackage_GetItems_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KanbanPackageServer).GetItems(ctx, req.(*GetItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KanbanPackage_GetItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).GetItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KanbanPackage_GetItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).GetItem(ctx, req.(*DeleteReactionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -518,6 +551,10 @@ var KanbanPackage_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetItems",
 			Handler:    _KanbanPackage_GetItems_Handler,
+		},
+		{
+			MethodName: "GetItem",
+			Handler:    _KanbanPackage_GetItem_Handler,
 		},
 		{
 			MethodName: "UpdateItem",

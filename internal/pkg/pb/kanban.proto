@@ -13,6 +13,7 @@ service KanbanPackage {
   rpc GetLabel(GetLabelRequest) returns (Label);
   rpc AddItem(AddItemRequest) returns (Item);
   rpc GetItems(GetItemRequest) returns (GetItemResponse);
+  rpc GetItem(DeleteReactionRequest) returns (Item);
   rpc UpdateItem(UpdateItemRequest) returns (Item);
   rpc AddComment(CommentRequest) returns (Comment);
   rpc UpdateComment(UpdateCommentRequest) returns (Comment);

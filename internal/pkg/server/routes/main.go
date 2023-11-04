@@ -21,18 +21,30 @@ func CreateRoutes(r *gin.Engine) {
 	// --------------------- Kanban endpoints
 	r.GET("/kanban", getKanban)
 	r.POST("/kanban", createKanban)
+	r.GET("/kanban/export", exportKanban)
 	// --------------------- Kanban label endpoints
 	r.GET("/kanban/label", GetLabel)
 	r.GET("/kanban/labels", GetLabels)
 	r.POST("/kanban/label", createLabel)
 	// --------------------- Kanban item endpoints
 	r.POST("/kanban/item", createItem)
-	r.GET("/kanban/item", getItems)
+	r.GET("/kanban/item", getItem)
+	r.GET("/kanban/items", getItems)
 	r.PATCH("/kanban/item", updateItem)
 	// --------------------- Kanban comment endpoints
 	r.POST("/kanban/comment", AddComment)
 	r.PATCH("/kanban/comment", UpdateComment)
 	r.DELETE("/kanban/comment", DeleteComment)
-	// --------------------- Kanban endpoints
-	r.GET("/kanban/export", exportKanban)
+	// --------------------- Page endpoints
+	r.POST("/page", CreatePage)
+	r.GET("/page/:route", GetFullPage)
+	// --------------------- Page template endpoints
+	r.POST("/page/template", CreateTemplate)
+	r.PATCH("/page/template", UpdateTemplate)
+	// --------------------- Page link endpoints
+	r.POST("/page/links", CreateLink)
+	r.PATCH("/page/links", UpdateLinks)
+	// --------------------- Page meta links endpoints
+	r.POST("/page/meta", CreateMetaLink)
+	r.PATCH("/page/meta", UpdateMetaLink)
 }

@@ -21,6 +21,18 @@ type Auth struct {
 	UserAccountId string
 }
 
+type Metadata struct {
+	gorm.Model
+	Id       string
+	Name     string
+	PhotoUrl string
+}
+
+type Settings struct {
+	gorm.Model
+	Id string
+}
+
 type UserAccount struct {
 	gorm.Model
 	Id          string `gorm:"primaryKey"`
@@ -54,7 +66,7 @@ func CreateConnection() *gorm.DB {
 		panic("Cannot connect to database")
 	}
 
-	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{})
+	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{}, &Page{}, &Template{}, &Meta{}, &PageLinks{})
 	if err != nil {
 		fmt.Println(err)
 		return nil
