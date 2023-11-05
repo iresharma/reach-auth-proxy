@@ -6,9 +6,9 @@ package page_package;
 
 service PagePackage {
   rpc GetPage(IdRequest) returns (Page);
-  rpc CreatePage(PageRequest) returns (Page);
+  rpc CreatePage(PageRequest) returns (PageResponse);
   rpc CreateTemplate(TemplateRequest) returns (Template);
-  rpc UpdateTemplate(IdResponse) returns (VoidResponse);
+  rpc UpdateTemplate(TemplateRequest) returns (VoidResponse);
   rpc CreateLink(CreateLinkRequest) returns (PageLinks);
   rpc UpdateLink(PageLinks) returns (VoidResponse);
   rpc CreateMetaLink(Meta) returns (Meta);
@@ -95,3 +95,7 @@ message IdResponse {
 }
 
 message VoidResponse {}
+
+message PageResponse {
+  string id = 1;
+}

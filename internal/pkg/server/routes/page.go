@@ -1,7 +1,8 @@
 package routes
 
 import (
-	"awesomeProject/internal/pkg/database"
+	"awesomeProject/internal/pkg/RPC"
+	pb "awesomeProject/internal/pkg/RPC/page"
 	"awesomeProject/internal/pkg/redis"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -10,8 +11,8 @@ import (
 
 func GetFullPage(c *gin.Context) {
 	param, _ := c.Params.Get("route")
-	res := database.GetPage(param)
-	c.JSON(http.StatusOK, res)
+	res := pb.GetPage(param)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
 func CreatePage(c *gin.Context) {
@@ -34,8 +35,8 @@ func CreatePage(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	res := database.CreatePage(userAccount)
-	c.JSON(http.StatusOK, res)
+	res := pb.CreatePage(userAccount, c.Request.Form.Get("route"))
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
 func CreateTemplate(c *gin.Context) {
@@ -58,7 +59,7 @@ func CreateTemplate(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	res := database.CreateTemplate(page)
+	res := pb.CreateTemplate(c.Request.Form.Get("Name"), c.Request.Form.Get("Desc"), c.Request.Form.Get("Image"), c.Request.Form.Get("Button"), c.Request.Form.Get("Background"), c.Request.Form.Get("Font"), c.Request.Form.Get("FontColor"), page, c.Request.Form.Get("Social") == "true", c.Request.Form.Get("SocialPosition"))
 	c.JSON(http.StatusOK, res)
 }
 
@@ -82,7 +83,7 @@ func UpdateTemplate(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	database.UpdateTemplate(page, c.Request.Form)
+	pb.UpdateTemplate(c.Request.Form.Get("Name"), c.Request.Form.Get("Desc"), c.Request.Form.Get("Image"), c.Request.Form.Get("Button"), c.Request.Form.Get("Background"), c.Request.Form.Get("Font"), c.Request.Form.Get("FontColor"), page, c.Request.Form.Get("Social") == "true", c.Request.Form.Get("SocialPosition"))
 	c.String(http.StatusOK, "Worked")
 }
 
@@ -106,8 +107,8 @@ func CreateLink(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	res := database.CreateLink(page, c.Request.Form.Get("Name"), c.Request.Form.Get("Link"), c.Request.Form.Get("Icon"), c.Request.Form.Get("isSocialIcon") == "true")
-	c.JSON(http.StatusOK, res)
+	res := pb.CreateLink(page, c.Request.Form.Get("Name"), c.Request.Form.Get("Link"), c.Request.Form.Get("Icon"), c.Request.Form.Get("isSocialIcon") == "true")
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
 func UpdateLinks(c *gin.Context) {
@@ -119,6 +120,7 @@ func UpdateLinks(c *gin.Context) {
 	headers := c.Request.Header
 	sessionToken := headers["X-Session"][0]
 	authId := headers["X-Auth"][0]
+	page := headers["X-Page"][0]
 	cacheResp, er := redis.FetchSessionCache(sessionToken)
 	if er != nil {
 		fmt.Println(*er)
@@ -129,7 +131,7 @@ func UpdateLinks(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	database.UpdateLink(c.Request.Form.Get("id"), c.Request.Form)
+	pb.UpdateLink(page, c.Request.Form.Get("id"), c.Request.Form.Get("Name"), c.Request.Form.Get("Link"), c.Request.Form.Get("Icon"), c.Request.Form.Get("isSocialIcon") == "true")
 	c.String(http.StatusOK, "OK")
 }
 
@@ -152,7 +154,7 @@ func CreateMetaLink(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	link := database.CreateMetaLinks(c.Request.Form.Get("template_id"), c.Request.Form.Get("tag_type"), c.Request.Form.Get("value"))
+	link := pb.CreateMetaLinks(c.Request.Form.Get("template_id"), c.Request.Form.Get("tag_type"), c.Request.Form.Get("value"))
 	c.JSON(http.StatusOK, link)
 }
 
@@ -175,6 +177,6 @@ func UpdateMetaLink(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	database.UpdateMetaLink(c.Request.Form.Get("id"), c.Request.Form)
+	pb.UpdateMetaLink(c.Request.Form.Get("id"), c.Request.Form.Get("template_id"), c.Request.Form.Get("tag_type"), c.Request.Form.Get("value"))
 	c.String(http.StatusOK, "OK")
 }

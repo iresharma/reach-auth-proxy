@@ -66,7 +66,7 @@ func CreateConnection() *gorm.DB {
 		panic("Cannot connect to database")
 	}
 
-	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{}, &Page{}, &Template{}, &Meta{}, &PageLinks{})
+	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{})
 	if err != nil {
 		fmt.Println(err)
 		return nil

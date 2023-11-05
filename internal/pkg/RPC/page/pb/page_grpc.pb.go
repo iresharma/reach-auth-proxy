@@ -23,9 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PagePackageClient interface {
 	GetPage(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Page, error)
-	CreatePage(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*Page, error)
+	CreatePage(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*PageResponse, error)
 	CreateTemplate(ctx context.Context, in *TemplateRequest, opts ...grpc.CallOption) (*Template, error)
-	UpdateTemplate(ctx context.Context, in *IdResponse, opts ...grpc.CallOption) (*VoidResponse, error)
+	UpdateTemplate(ctx context.Context, in *TemplateRequest, opts ...grpc.CallOption) (*VoidResponse, error)
 	CreateLink(ctx context.Context, in *CreateLinkRequest, opts ...grpc.CallOption) (*PageLinks, error)
 	UpdateLink(ctx context.Context, in *PageLinks, opts ...grpc.CallOption) (*VoidResponse, error)
 	CreateMetaLink(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Meta, error)
@@ -49,8 +49,8 @@ func (c *pagePackageClient) GetPage(ctx context.Context, in *IdRequest, opts ...
 	return out, nil
 }
 
-func (c *pagePackageClient) CreatePage(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*Page, error) {
-	out := new(Page)
+func (c *pagePackageClient) CreatePage(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*PageResponse, error) {
+	out := new(PageResponse)
 	err := c.cc.Invoke(ctx, "/page_package.PagePackage/CreatePage", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (c *pagePackageClient) CreateTemplate(ctx context.Context, in *TemplateRequ
 	return out, nil
 }
 
-func (c *pagePackageClient) UpdateTemplate(ctx context.Context, in *IdResponse, opts ...grpc.CallOption) (*VoidResponse, error) {
+func (c *pagePackageClient) UpdateTemplate(ctx context.Context, in *TemplateRequest, opts ...grpc.CallOption) (*VoidResponse, error) {
 	out := new(VoidResponse)
 	err := c.cc.Invoke(ctx, "/page_package.PagePackage/UpdateTemplate", in, out, opts...)
 	if err != nil {
@@ -117,9 +117,9 @@ func (c *pagePackageClient) UpdateMetaLink(ctx context.Context, in *Meta, opts .
 // for forward compatibility
 type PagePackageServer interface {
 	GetPage(context.Context, *IdRequest) (*Page, error)
-	CreatePage(context.Context, *PageRequest) (*Page, error)
+	CreatePage(context.Context, *PageRequest) (*PageResponse, error)
 	CreateTemplate(context.Context, *TemplateRequest) (*Template, error)
-	UpdateTemplate(context.Context, *IdResponse) (*VoidResponse, error)
+	UpdateTemplate(context.Context, *TemplateRequest) (*VoidResponse, error)
 	CreateLink(context.Context, *CreateLinkRequest) (*PageLinks, error)
 	UpdateLink(context.Context, *PageLinks) (*VoidResponse, error)
 	CreateMetaLink(context.Context, *Meta) (*Meta, error)
@@ -134,13 +134,13 @@ type UnimplementedPagePackageServer struct {
 func (UnimplementedPagePackageServer) GetPage(context.Context, *IdRequest) (*Page, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPage not implemented")
 }
-func (UnimplementedPagePackageServer) CreatePage(context.Context, *PageRequest) (*Page, error) {
+func (UnimplementedPagePackageServer) CreatePage(context.Context, *PageRequest) (*PageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePage not implemented")
 }
 func (UnimplementedPagePackageServer) CreateTemplate(context.Context, *TemplateRequest) (*Template, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTemplate not implemented")
 }
-func (UnimplementedPagePackageServer) UpdateTemplate(context.Context, *IdResponse) (*VoidResponse, error) {
+func (UnimplementedPagePackageServer) UpdateTemplate(context.Context, *TemplateRequest) (*VoidResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTemplate not implemented")
 }
 func (UnimplementedPagePackageServer) CreateLink(context.Context, *CreateLinkRequest) (*PageLinks, error) {
@@ -223,7 +223,7 @@ func _PagePackage_CreateTemplate_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _PagePackage_UpdateTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IdResponse)
+	in := new(TemplateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -235,7 +235,7 @@ func _PagePackage_UpdateTemplate_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: "/page_package.PagePackage/UpdateTemplate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PagePackageServer).UpdateTemplate(ctx, req.(*IdResponse))
+		return srv.(PagePackageServer).UpdateTemplate(ctx, req.(*TemplateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
