@@ -6,6 +6,7 @@ package page_package;
 
 service PagePackage {
   rpc GetPage(IdRequest) returns (Page);
+  rpc GetPageId(IdRequest) returns (Page);
   rpc CreatePage(PageRequest) returns (PageResponse);
   rpc CreateTemplate(TemplateRequest) returns (Template);
   rpc UpdateTemplate(TemplateRequest) returns (VoidResponse);
@@ -86,6 +87,7 @@ message CreateLinkRequest {
   string Icon = 3;
   bool IsSocialIcon = 4;
   string pageId = 5;
+  int32 sequence = 6;
 }
 
 // Responses

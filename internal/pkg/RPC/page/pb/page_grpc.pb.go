@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PagePackageClient interface {
 	GetPage(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Page, error)
+	GetPageId(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Page, error)
 	CreatePage(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*PageResponse, error)
 	CreateTemplate(ctx context.Context, in *TemplateRequest, opts ...grpc.CallOption) (*Template, error)
 	UpdateTemplate(ctx context.Context, in *TemplateRequest, opts ...grpc.CallOption) (*VoidResponse, error)
@@ -43,6 +44,15 @@ func NewPagePackageClient(cc grpc.ClientConnInterface) PagePackageClient {
 func (c *pagePackageClient) GetPage(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Page, error) {
 	out := new(Page)
 	err := c.cc.Invoke(ctx, "/page_package.PagePackage/GetPage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pagePackageClient) GetPageId(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Page, error) {
+	out := new(Page)
+	err := c.cc.Invoke(ctx, "/page_package.PagePackage/GetPageId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,6 +127,7 @@ func (c *pagePackageClient) UpdateMetaLink(ctx context.Context, in *Meta, opts .
 // for forward compatibility
 type PagePackageServer interface {
 	GetPage(context.Context, *IdRequest) (*Page, error)
+	GetPageId(context.Context, *IdRequest) (*Page, error)
 	CreatePage(context.Context, *PageRequest) (*PageResponse, error)
 	CreateTemplate(context.Context, *TemplateRequest) (*Template, error)
 	UpdateTemplate(context.Context, *TemplateRequest) (*VoidResponse, error)
@@ -133,6 +144,9 @@ type UnimplementedPagePackageServer struct {
 
 func (UnimplementedPagePackageServer) GetPage(context.Context, *IdRequest) (*Page, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPage not implemented")
+}
+func (UnimplementedPagePackageServer) GetPageId(context.Context, *IdRequest) (*Page, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPageId not implemented")
 }
 func (UnimplementedPagePackageServer) CreatePage(context.Context, *PageRequest) (*PageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePage not implemented")
@@ -182,6 +196,24 @@ func _PagePackage_GetPage_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PagePackageServer).GetPage(ctx, req.(*IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PagePackage_GetPageId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PagePackageServer).GetPageId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/page_package.PagePackage/GetPageId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PagePackageServer).GetPageId(ctx, req.(*IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -322,6 +354,10 @@ var PagePackage_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPage",
 			Handler:    _PagePackage_GetPage_Handler,
+		},
+		{
+			MethodName: "GetPageId",
+			Handler:    _PagePackage_GetPageId_Handler,
 		},
 		{
 			MethodName: "CreatePage",

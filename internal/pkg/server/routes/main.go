@@ -38,6 +38,7 @@ func CreateRoutes(r *gin.Engine) {
 	// --------------------- Page endpoints
 	r.POST("/page", CreatePage)
 	r.GET("/page/:route", GetFullPage)
+	r.GET("/page/id/:id", GetFullPageId)
 	// --------------------- Page template endpoints
 	r.POST("/page/template", CreateTemplate)
 	r.PATCH("/page/template", UpdateTemplate)

@@ -15,6 +15,12 @@ func GetFullPage(c *gin.Context) {
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
+func GetFullPageId(c *gin.Context) {
+	param, _ := c.Params.Get("route")
+	res := pb.GetPage(param)
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
 func CreatePage(c *gin.Context) {
 	err := c.Request.ParseForm()
 	if err != nil {
