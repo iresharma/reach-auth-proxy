@@ -17,7 +17,7 @@ func GetFullPage(c *gin.Context) {
 
 func GetFullPageId(c *gin.Context) {
 	param, _ := c.Params.Get("route")
-	res := pb.GetPage(param)
+	res := pb.GetPageId(param)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 

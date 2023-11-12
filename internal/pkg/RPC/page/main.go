@@ -50,7 +50,7 @@ func GetPage(id string) pageProto.Page {
 		Id: id,
 	}
 
-	res, err := client.GetPageId(ctx, &reqObj)
+	res, err := client.GetPage(ctx, &reqObj)
 	if err != nil {
 		log.Println(err)
 	}
@@ -67,7 +67,7 @@ func GetPageId(id string) pageProto.Page {
 		Id: id,
 	}
 
-	res, err := client.GetPage(ctx, &reqObj)
+	res, err := client.GetPageId(ctx, &reqObj)
 	if err != nil {
 		log.Println(err)
 	}
