@@ -55,6 +55,7 @@ message PageLinks {
   string Icon = 4;
   bool Social = 5;
   string PageId = 6;
+  int32 sequence = 7;
 }
 
 // Requests
