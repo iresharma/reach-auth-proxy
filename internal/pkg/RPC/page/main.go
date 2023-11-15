@@ -126,7 +126,7 @@ func UpdateTemplate(Name string, Desc string, Image string, Button string, Backg
 	return *res
 }
 
-func CreateLink(pageId string, name string, link string, icon string, social bool) pageProto.PageLinks {
+func CreateLink(pageId string, name string, link string, icon string, social bool, sequence int) pageProto.PageLinks {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -138,6 +138,7 @@ func CreateLink(pageId string, name string, link string, icon string, social boo
 		Link:         link,
 		Icon:         icon,
 		IsSocialIcon: social,
+		Sequence:     int32(sequence),
 	}
 
 	res, err := client.CreateLink(ctx, &reqObj)

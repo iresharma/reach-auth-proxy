@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func GetFullPage(c *gin.Context) {
@@ -113,7 +114,12 @@ func CreateLink(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	res := pb.CreateLink(page, c.Request.Form.Get("Name"), c.Request.Form.Get("Link"), c.Request.Form.Get("Icon"), c.Request.Form.Get("isSocialIcon") == "true")
+	sequence, err := strconv.ParseInt(c.Request.Form.Get("sequence"), 10, 32)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "dafaq")
+		return
+	}
+	res := pb.CreateLink(page, c.Request.Form.Get("Name"), c.Request.Form.Get("Link"), c.Request.Form.Get("Icon"), c.Request.Form.Get("isSocialIcon") == "true", int(sequence))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
