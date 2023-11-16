@@ -10,6 +10,11 @@ import (
 	"strconv"
 )
 
+func ServerBuild(c *gin.Context) {
+	res := pb.ServerBuild()
+	c.JSON(http.StatusOK, RPC.StructToMap(res))
+}
+
 func GetFullPage(c *gin.Context) {
 	param, _ := c.Params.Get("route")
 	res := pb.GetPage(param)
@@ -143,7 +148,8 @@ func UpdateLinks(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "Not Allowed")
 		return
 	}
-	pb.UpdateLink(page, c.Request.Form.Get("id"), c.Request.Form.Get("Name"), c.Request.Form.Get("Link"), c.Request.Form.Get("Icon"), c.Request.Form.Get("isSocialIcon") == "true")
+	sequence, err := strconv.ParseInt(c.Request.Form.Get("sequence"), 10, 32)
+	pb.UpdateLink(page, c.Request.Form.Get("id"), c.Request.Form.Get("Name"), c.Request.Form.Get("Link"), c.Request.Form.Get("Icon"), c.Request.Form.Get("isSocialIcon") == "true", int(sequence))
 	c.String(http.StatusOK, "OK")
 }
 

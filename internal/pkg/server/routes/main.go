@@ -48,4 +48,6 @@ func CreateRoutes(r *gin.Engine) {
 	// --------------------- Page meta links endpoints
 	r.POST("/page/meta", CreateMetaLink)
 	r.PATCH("/page/meta", UpdateMetaLink)
+	// --------------------- Page meta links endpoints
+	r.GET("/page/server", ServerBuild)
 }

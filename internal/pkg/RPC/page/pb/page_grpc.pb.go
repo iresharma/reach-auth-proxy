@@ -31,6 +31,7 @@ type PagePackageClient interface {
 	UpdateLink(ctx context.Context, in *PageLinks, opts ...grpc.CallOption) (*VoidResponse, error)
 	CreateMetaLink(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Meta, error)
 	UpdateMetaLink(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*VoidResponse, error)
+	ServerBuild(ctx context.Context, in *VoidResponse, opts ...grpc.CallOption) (*ServerBuildResponse, error)
 }
 
 type pagePackageClient struct {
@@ -122,6 +123,15 @@ func (c *pagePackageClient) UpdateMetaLink(ctx context.Context, in *Meta, opts .
 	return out, nil
 }
 
+func (c *pagePackageClient) ServerBuild(ctx context.Context, in *VoidResponse, opts ...grpc.CallOption) (*ServerBuildResponse, error) {
+	out := new(ServerBuildResponse)
+	err := c.cc.Invoke(ctx, "/page_package.PagePackage/ServerBuild", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PagePackageServer is the server API for PagePackage service.
 // All implementations must embed UnimplementedPagePackageServer
 // for forward compatibility
@@ -135,6 +145,7 @@ type PagePackageServer interface {
 	UpdateLink(context.Context, *PageLinks) (*VoidResponse, error)
 	CreateMetaLink(context.Context, *Meta) (*Meta, error)
 	UpdateMetaLink(context.Context, *Meta) (*VoidResponse, error)
+	ServerBuild(context.Context, *VoidResponse) (*ServerBuildResponse, error)
 	mustEmbedUnimplementedPagePackageServer()
 }
 
@@ -168,6 +179,9 @@ func (UnimplementedPagePackageServer) CreateMetaLink(context.Context, *Meta) (*M
 }
 func (UnimplementedPagePackageServer) UpdateMetaLink(context.Context, *Meta) (*VoidResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateMetaLink not implemented")
+}
+func (UnimplementedPagePackageServer) ServerBuild(context.Context, *VoidResponse) (*ServerBuildResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ServerBuild not implemented")
 }
 func (UnimplementedPagePackageServer) mustEmbedUnimplementedPagePackageServer() {}
 
@@ -344,6 +358,24 @@ func _PagePackage_UpdateMetaLink_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PagePackage_ServerBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VoidResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PagePackageServer).ServerBuild(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/page_package.PagePackage/ServerBuild",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PagePackageServer).ServerBuild(ctx, req.(*VoidResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PagePackage_ServiceDesc is the grpc.ServiceDesc for PagePackage service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -386,6 +418,10 @@ var PagePackage_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateMetaLink",
 			Handler:    _PagePackage_UpdateMetaLink_Handler,
+		},
+		{
+			MethodName: "ServerBuild",
+			Handler:    _PagePackage_ServerBuild_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

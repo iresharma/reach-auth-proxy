@@ -22,6 +22,21 @@ func CreatePageClient() (pageProto.PagePackageClient, *grpc.ClientConn) {
 	return client, pageConn
 }
 
+func ServerBuild() pageProto.ServerBuildResponse {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreatePageClient()
+	defer conn.Close()
+
+	reqObj := pageProto.VoidResponse{}
+
+	res, err := client.ServerBuild(ctx, &reqObj)
+	if err != nil {
+		log.Println(err)
+	}
+	return *res
+}
+
 func CreatePage(userAccountId string, route string) pageProto.PageResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -148,19 +163,20 @@ func CreateLink(pageId string, name string, link string, icon string, social boo
 	return *res
 }
 
-func UpdateLink(pageId string, id string, name string, link string, icon string, social bool) {
+func UpdateLink(pageId string, id string, name string, link string, icon string, social bool, sequence int) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
 
 	reqObj := pageProto.PageLinks{
-		PageId: pageId,
-		Name:   name,
-		Link:   link,
-		Icon:   icon,
-		Social: social,
-		Id:     id,
+		PageId:   pageId,
+		Name:     name,
+		Link:     link,
+		Icon:     icon,
+		Social:   social,
+		Id:       id,
+		Sequence: int32(sequence),
 	}
 
 	_, err := client.UpdateLink(ctx, &reqObj)
