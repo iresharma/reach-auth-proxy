@@ -6,11 +6,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"os"
 	"time"
 )
 
-const (
-	pageDomain = "localhost:4001"
+var (
+	pageDomain = os.Getenv("PAGE_SERVER")
 )
 
 func CreatePageClient() (pageProto.PagePackageClient, *grpc.ClientConn) {

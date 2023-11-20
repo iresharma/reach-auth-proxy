@@ -9,11 +9,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/url"
+	"os"
 	"time"
 )
 
-const (
-	KanbanDomain = "localhost:4040"
+var (
+	KanbanDomain = os.Getenv("KANBAN_SERVER")
 )
 
 func CreateKanbanClient() (kanbanProto.KanbanPackageClient, *grpc.ClientConn) {
