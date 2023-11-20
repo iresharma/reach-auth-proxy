@@ -6,9 +6,10 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
 )
 
-var connStr = "postgresql://iresharma@localhost/reach-systems"
+var connStr = os.Getenv("POSTGRES")
 var DB *gorm.DB = nil
 
 type Auth struct {

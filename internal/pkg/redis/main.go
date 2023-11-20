@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"os"
 	"time"
 )
 
@@ -12,7 +13,7 @@ var Rdb *redis.Client
 
 func InitRedis() *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: os.Getenv("REDIS"),
 	})
 	return client
 }
