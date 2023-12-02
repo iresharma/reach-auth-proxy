@@ -20,6 +20,8 @@ type Auth struct {
 	Salt          string
 	Perm          string
 	UserAccountId string
+	MetadataId    *string
+	SettingsId    *string
 }
 
 type Metadata struct {
@@ -67,7 +69,7 @@ func CreateConnection() *gorm.DB {
 		panic("Cannot connect to database")
 	}
 
-	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{})
+	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{}, &Settings{}, &Metadata{})
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -221,4 +223,47 @@ func GetKanban(userAccountId string) string {
 		panic(err)
 	}
 	return boardId
+}
+
+func CreateMetaData(name string, photoUrl *string, authId string) (*string, *string) {
+	metaDataId := uuid.New().String()
+	metaDataItem := Metadata{Id: metaDataId, Name: name}
+	var authItem Auth
+	if photoUrl != nil {
+		metaDataItem.PhotoUrl = *photoUrl
+	}
+	if err := DB.First(&authItem).Where("id = ?", authId).Error; err != nil {
+		resp := "User doesn't exist"
+		return nil, &resp
+	}
+	if authItem.MetadataId != nil {
+		resp := "User already has metadata"
+		return nil, &resp
+	}
+	if err := DB.Create(&metaDataItem).Error; err != nil {
+		panic("Something fucked up")
+	}
+	if err := DB.Model(&Auth{}).Where("id = ?", authId).Update("metadata_id", metaDataId).Error; err != nil {
+		if err := DB.Delete(&Metadata{}, metaDataId).Error; err != nil {
+			//	no-op
+		}
+		panic("Auth Item update failed")
+	}
+	return &metaDataId, nil
+}
+
+func UpdateMetadata(metadataId string, name string, photoUrl string) {
+	metaData := Metadata{}
+	if name != "" {
+		metaData.Name = name
+	}
+	if photoUrl != "" {
+		metaData.PhotoUrl = photoUrl
+	}
+	if name != "" && photoUrl != "" {
+		if err := DB.Model(&Metadata{}).Where("id = ?", metadataId).Updates(metaData).Error; err != nil {
+			fmt.Println(err)
+			panic("shit")
+		}
+	}
 }

@@ -232,3 +232,57 @@ func checkUserInUserAccount(c *gin.Context) {
 		"res": res,
 	})
 }
+
+func createMetadata(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	request := c.Request
+	sessionResponse := utils.ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
+		return
+	}
+	if err != nil {
+		c.String(http.StatusBadRequest, "Form body not found")
+		return
+	}
+	formData := c.Request.Form
+	name := formData.Get("name")
+	if name == "" {
+		c.String(http.StatusBadRequest, "Name is a required field")
+		return
+	}
+	photoUrl := formData.Get("photoUrl")
+	metaData, erro := database.CreateMetaData(name, &photoUrl, request.Header.Get("X-Auth"))
+	if erro != nil {
+		c.String(http.StatusInternalServerError, *erro)
+		return
+	}
+	c.String(http.StatusCreated, "User metadata created with id:"+*metaData)
+}
+
+func updateMetaData(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	request := c.Request
+	sessionResponse := utils.ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
+		return
+	}
+	if err != nil {
+		c.String(http.StatusBadRequest, "Form body not found")
+		return
+	}
+	metaDataId := request.Header.Get("X-MetaData")
+	formData := c.Request.Form
+	name := formData.Get("name")
+	photoUrl := formData.Get("photoUrl")
+	database.UpdateMetadata(metaDataId, name, photoUrl)
+}
