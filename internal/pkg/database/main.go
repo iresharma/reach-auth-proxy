@@ -267,3 +267,37 @@ func UpdateMetadata(metadataId string, name string, photoUrl string) {
 		}
 	}
 }
+
+func GenerateUserAccountJoinToken(userAccountId string) (*string, *string) {
+	inviteCode := uuid.New().String()
+	inviteCodeId := uuid.New().String()
+	invitecodeObject := UserAccountInviteCode{
+		Id:            inviteCodeId,
+		UserAccountId: userAccountId,
+		Code:          inviteCode,
+	}
+	if err := DB.Create(&invitecodeObject).Error; err != nil {
+		resp := "Could not create invite code"
+		return nil, &resp
+	}
+	return &inviteCode, nil
+}
+
+func ConsumeToken(token string, authId string) *string {
+	var invite UserAccountInviteCode
+	if err := DB.First(&invite).Where("code = ?", token).Error; err != nil {
+		resp := "Invalid code "
+		return &resp
+	}
+	var authItem Auth
+	if err := DB.First(&authItem).Where("id = ?", authId).Error; err != nil {
+		resp := "Couldn't find user"
+		return &resp
+	}
+	authItem.UserAccountId = invite.UserAccountId
+	if err := DB.Model(&Auth{}).Where("id = ?", authId).Updates(authItem).Error; err != nil {
+		resp := "Failed to update authItem"
+		return &resp
+	}
+	return nil
+}

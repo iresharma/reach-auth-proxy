@@ -233,6 +233,37 @@ func checkUserInUserAccount(c *gin.Context) {
 	})
 }
 
+func generateUserAccountJoinToken(c *gin.Context) {
+	request := c.Request
+	sessionResponse := utils.ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
+		return
+	}
+	inviteCode, err := database.GenerateUserAccountJoinToken(request.Header.Get("X-UserAccount"))
+	if err != nil {
+		c.String(http.StatusInternalServerError, *err)
+		return
+	}
+	c.String(http.StatusOK, *inviteCode)
+}
+
+func verifyInviteToken(c *gin.Context) {
+	request := c.Request
+	sessionResponse := utils.ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
+		return
+	}
+	token := c.Query("token")
+	inviteCode := database.ConsumeToken(token, request.Header.Get("X-Auth"))
+	if inviteCode != nil {
+		c.String(http.StatusInternalServerError, *inviteCode)
+		return
+	}
+	c.String(http.StatusOK, "User Added")
+}
+
 func createMetadata(c *gin.Context) {
 	err := c.Request.ParseForm()
 	if err != nil {

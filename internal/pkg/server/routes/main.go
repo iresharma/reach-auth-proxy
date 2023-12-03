@@ -15,6 +15,8 @@ func CreateRoutes(r *gin.Engine) {
 	r.GET("/userAccount", getUserAccount)
 	r.GET("/user/userAccount", getUserAccountForUser)
 	r.GET("/userAccount/user", checkUserInUserAccount)
+	r.GET("/userAccount/token", generateUserAccountJoinToken)
+	r.GET("/userAccount/verify", verifyInviteToken)
 	// ---------------------Session endpoints
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
