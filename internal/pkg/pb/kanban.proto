@@ -100,7 +100,7 @@ message AddItemRequest {
   STATUS status = 2;
   string title = 3;
   string desc = 4;
-  map<string, string> links = 5;
+  string links = 5;
   string boardId = 6;
   string userId = 7;
 }

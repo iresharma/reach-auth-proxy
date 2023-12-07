@@ -103,7 +103,8 @@ func createItem(c *gin.Context) {
 	//permArr := strings.Split((*cacheResp)["perm"], ";")
 	body := c.Request.Form
 	board := c.Request.Header["X-Board"][0]
-	res := kanban.AddItem(body, board)
+	auth := c.Request.Header["X-Auth"][0]
+	res := kanban.AddItem(body, board, auth)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 

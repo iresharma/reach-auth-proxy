@@ -3,7 +3,6 @@ package kanban
 import (
 	kanbanProto "awesomeProject/internal/pkg/RPC/kanban/proto"
 	"context"
-	"encoding/json"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -63,7 +62,7 @@ func AddLabel(boardId string, color string, label string) kanbanProto.Label {
 	return *res
 }
 
-func AddItem(body url.Values, board string) kanbanProto.Item {
+func AddItem(body url.Values, board string, auth string) kanbanProto.Item {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -89,25 +88,14 @@ func AddItem(body url.Values, board string) kanbanProto.Item {
 		break
 	}
 
-	var links map[string]string
-	decodeVal, err := url.QueryUnescape(body.Get("links"))
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	fmt.Println(decodeVal)
-	err = json.Unmarshal([]byte(decodeVal), &links)
-	if err != nil {
-		panic(err)
-	}
-
 	reqObj := kanbanProto.AddItemRequest{
 		Label:   body.Get("label"),
 		Status:  status,
 		Title:   body.Get("title"),
 		Desc:    body.Get("desc"),
-		Links:   links,
+		Links:   body.Get("links"),
 		BoardId: board,
+		UserId:  auth,
 	}
 
 	res, err := client.AddItem(ctx, &reqObj)
