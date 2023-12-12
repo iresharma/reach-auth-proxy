@@ -61,6 +61,7 @@ func createLabel(c *gin.Context) {
 	body := c.Request.Form
 	fmt.Println(body)
 	res := kanban.AddLabel(body.Get("board"), body.Get("color"), body.Get("label"))
+	redis.DeleteFromRedis(body.Get("board") + ":limit")
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -72,8 +73,17 @@ func GetLabels(c *gin.Context) {
 		return
 	}
 	query := request.Header.Get("X-Board")
+	resCache := redis.GetItemFromRedis(query + ":Labels")
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.GetLabels(query)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(query+":Labels", marshalledRes)
+	log.Println("Reached here")
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func GetLabel(c *gin.Context) {
@@ -105,6 +115,7 @@ func createItem(c *gin.Context) {
 	board := c.Request.Header["X-Board"][0]
 	auth := c.Request.Header["X-Auth"][0]
 	res := kanban.AddItem(body, board, auth)
+	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -131,8 +142,16 @@ func getItems(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
+	resCache := redis.GetItemFromRedis(boardId + ":items:page:" + pageStr + ":limit:" + limitStr)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.GetItems(page, limit, boardId)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(boardId+":items:page:"+pageStr+":limit:"+limitStr, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func getItem(c *gin.Context) {
@@ -161,6 +180,7 @@ func updateItem(c *gin.Context) {
 	}
 	body := c.Request.Form
 	res := kanban.UpdateItem(body)
+	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
