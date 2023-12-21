@@ -15,6 +15,7 @@ service KanbanPackage {
   rpc GetItems(GetItemRequest) returns (GetItemResponse);
   rpc GetItem(DeleteReactionRequest) returns (Item);
   rpc UpdateItem(UpdateItemRequest) returns (Item);
+  rpc DeleteItem(DeleteReactionRequest) returns (VoidResp);
   rpc AddComment(CommentRequest) returns (Comment);
   rpc UpdateComment(UpdateCommentRequest) returns (Comment);
   rpc DeleteComment(DeleteCommentRequest) returns (VoidResp);

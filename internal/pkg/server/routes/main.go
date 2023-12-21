@@ -36,6 +36,7 @@ func CreateRoutes(r *gin.Engine) {
 	r.GET("/kanban/item", getItem)
 	r.GET("/kanban/items", getItems)
 	r.PATCH("/kanban/item", updateItem)
+	r.DELETE("/kanban/item", DeleteItem)
 	// --------------------- Kanban comment endpoints
 	r.POST("/kanban/comment", AddComment)
 	r.PATCH("/kanban/comment", UpdateComment)
@@ -50,6 +51,7 @@ func CreateRoutes(r *gin.Engine) {
 	// --------------------- Page link endpoints
 	r.POST("/page/links", CreateLink)
 	r.PATCH("/page/links", UpdateLinks)
+	r.DELETE("/page/link", DeleteLink)
 	// --------------------- Page meta links endpoints
 	r.POST("/page/meta", CreateMetaLink)
 	r.PATCH("/page/meta", UpdateMetaLink)

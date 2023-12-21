@@ -184,6 +184,24 @@ func updateItem(c *gin.Context) {
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
+func DeleteItem(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	request := c.Request
+	sessionResponse := utils.ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
+		return
+	}
+	body := c.Request.Form.Get("id")
+	kanban.DeleteItem(body)
+	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
+	c.String(http.StatusOK, "Item deleted")
+}
+
 func exportKanban(c *gin.Context) {
 	err := c.Request.ParseForm()
 	if err != nil {

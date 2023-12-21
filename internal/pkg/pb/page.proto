@@ -12,6 +12,7 @@ service PagePackage {
   rpc UpdateTemplate(TemplateRequest) returns (VoidResponse);
   rpc CreateLink(CreateLinkRequest) returns (PageLinks);
   rpc UpdateLink(PageLinks) returns (VoidResponse);
+  rpc DeleteLink(IdRequest) returns (VoidResponse);
   rpc CreateMetaLink(Meta) returns (Meta);
   rpc UpdateMetaLink(Meta) returns (VoidResponse);
   rpc ServerBuild(VoidResponse) returns (ServerBuildResponse);

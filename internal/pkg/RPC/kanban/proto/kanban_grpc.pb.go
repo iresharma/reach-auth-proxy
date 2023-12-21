@@ -30,6 +30,7 @@ type KanbanPackageClient interface {
 	GetItems(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error)
 	GetItem(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*Item, error)
 	UpdateItem(ctx context.Context, in *UpdateItemRequest, opts ...grpc.CallOption) (*Item, error)
+	DeleteItem(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*VoidResp, error)
 	AddComment(ctx context.Context, in *CommentRequest, opts ...grpc.CallOption) (*Comment, error)
 	UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*Comment, error)
 	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*VoidResp, error)
@@ -118,6 +119,15 @@ func (c *kanbanPackageClient) UpdateItem(ctx context.Context, in *UpdateItemRequ
 	return out, nil
 }
 
+func (c *kanbanPackageClient) DeleteItem(ctx context.Context, in *DeleteReactionRequest, opts ...grpc.CallOption) (*VoidResp, error) {
+	out := new(VoidResp)
+	err := c.cc.Invoke(ctx, "/kanban_package.KanbanPackage/DeleteItem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *kanbanPackageClient) AddComment(ctx context.Context, in *CommentRequest, opts ...grpc.CallOption) (*Comment, error) {
 	out := new(Comment)
 	err := c.cc.Invoke(ctx, "/kanban_package.KanbanPackage/AddComment", in, out, opts...)
@@ -184,6 +194,7 @@ type KanbanPackageServer interface {
 	GetItems(context.Context, *GetItemRequest) (*GetItemResponse, error)
 	GetItem(context.Context, *DeleteReactionRequest) (*Item, error)
 	UpdateItem(context.Context, *UpdateItemRequest) (*Item, error)
+	DeleteItem(context.Context, *DeleteReactionRequest) (*VoidResp, error)
 	AddComment(context.Context, *CommentRequest) (*Comment, error)
 	UpdateComment(context.Context, *UpdateCommentRequest) (*Comment, error)
 	DeleteComment(context.Context, *DeleteCommentRequest) (*VoidResp, error)
@@ -220,6 +231,9 @@ func (UnimplementedKanbanPackageServer) GetItem(context.Context, *DeleteReaction
 }
 func (UnimplementedKanbanPackageServer) UpdateItem(context.Context, *UpdateItemRequest) (*Item, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateItem not implemented")
+}
+func (UnimplementedKanbanPackageServer) DeleteItem(context.Context, *DeleteReactionRequest) (*VoidResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteItem not implemented")
 }
 func (UnimplementedKanbanPackageServer) AddComment(context.Context, *CommentRequest) (*Comment, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
@@ -396,6 +410,24 @@ func _KanbanPackage_UpdateItem_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KanbanPackage_DeleteItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KanbanPackageServer).DeleteItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/kanban_package.KanbanPackage/DeleteItem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KanbanPackageServer).DeleteItem(ctx, req.(*DeleteReactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _KanbanPackage_AddComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CommentRequest)
 	if err := dec(in); err != nil {
@@ -542,6 +574,10 @@ var KanbanPackage_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateItem",
 			Handler:    _KanbanPackage_UpdateItem_Handler,
+		},
+		{
+			MethodName: "DeleteItem",
+			Handler:    _KanbanPackage_DeleteItem_Handler,
 		},
 		{
 			MethodName: "AddComment",

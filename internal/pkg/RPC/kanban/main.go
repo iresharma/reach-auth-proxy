@@ -232,6 +232,24 @@ func UpdateItem(vals url.Values) kanbanProto.Item {
 	return *res
 }
 
+func DeleteItem(itemId string) kanbanProto.VoidResp {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreateKanbanClient()
+	defer conn.Close()
+
+	reqObjcet := kanbanProto.DeleteReactionRequest{
+		Id: itemId,
+	}
+
+	res, err := client.DeleteItem(ctx, &reqObjcet)
+	if err != nil {
+		log.Println(err)
+		log.Println("blah blah")
+	}
+	return *res
+}
+
 func ExportBoard(boardId string) kanbanProto.ExportResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

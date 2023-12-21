@@ -153,6 +153,29 @@ func UpdateLinks(c *gin.Context) {
 	c.String(http.StatusOK, "OK")
 }
 
+func DeleteLink(c *gin.Context) {
+	err := c.Request.ParseForm()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Fatal error while parsing form")
+		return
+	}
+	headers := c.Request.Header
+	sessionToken := headers["X-Session"][0]
+	authId := headers["X-Auth"][0]
+	cacheResp, er := redis.FetchSessionCache(sessionToken)
+	if er != nil {
+		fmt.Println(*er)
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	if (*cacheResp)["authId"] != authId {
+		c.String(http.StatusUnauthorized, "Not Allowed")
+		return
+	}
+	pb.DeleteLink(c.Query("id"))
+	c.String(http.StatusOK, "OK")
+}
+
 func CreateMetaLink(c *gin.Context) {
 	err := c.Request.ParseForm()
 	if err != nil {

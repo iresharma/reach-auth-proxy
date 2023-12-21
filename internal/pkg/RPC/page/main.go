@@ -186,6 +186,22 @@ func UpdateLink(pageId string, id string, name string, link string, icon string,
 	}
 }
 
+func DeleteLink(linkID string) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	client, conn := CreatePageClient()
+	defer conn.Close()
+
+	reqObj := pageProto.IdRequest{
+		Id: linkID,
+	}
+
+	_, err := client.DeleteLink(ctx, &reqObj)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 func CreateMetaLinks(templateId string, name string, value string) pageProto.Meta {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

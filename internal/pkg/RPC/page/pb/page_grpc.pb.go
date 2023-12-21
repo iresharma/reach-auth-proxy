@@ -29,6 +29,7 @@ type PagePackageClient interface {
 	UpdateTemplate(ctx context.Context, in *TemplateRequest, opts ...grpc.CallOption) (*VoidResponse, error)
 	CreateLink(ctx context.Context, in *CreateLinkRequest, opts ...grpc.CallOption) (*PageLinks, error)
 	UpdateLink(ctx context.Context, in *PageLinks, opts ...grpc.CallOption) (*VoidResponse, error)
+	DeleteLink(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*VoidResponse, error)
 	CreateMetaLink(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Meta, error)
 	UpdateMetaLink(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*VoidResponse, error)
 	ServerBuild(ctx context.Context, in *VoidResponse, opts ...grpc.CallOption) (*ServerBuildResponse, error)
@@ -105,6 +106,15 @@ func (c *pagePackageClient) UpdateLink(ctx context.Context, in *PageLinks, opts 
 	return out, nil
 }
 
+func (c *pagePackageClient) DeleteLink(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*VoidResponse, error) {
+	out := new(VoidResponse)
+	err := c.cc.Invoke(ctx, "/page_package.PagePackage/DeleteLink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *pagePackageClient) CreateMetaLink(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Meta, error) {
 	out := new(Meta)
 	err := c.cc.Invoke(ctx, "/page_package.PagePackage/CreateMetaLink", in, out, opts...)
@@ -143,6 +153,7 @@ type PagePackageServer interface {
 	UpdateTemplate(context.Context, *TemplateRequest) (*VoidResponse, error)
 	CreateLink(context.Context, *CreateLinkRequest) (*PageLinks, error)
 	UpdateLink(context.Context, *PageLinks) (*VoidResponse, error)
+	DeleteLink(context.Context, *IdRequest) (*VoidResponse, error)
 	CreateMetaLink(context.Context, *Meta) (*Meta, error)
 	UpdateMetaLink(context.Context, *Meta) (*VoidResponse, error)
 	ServerBuild(context.Context, *VoidResponse) (*ServerBuildResponse, error)
@@ -173,6 +184,9 @@ func (UnimplementedPagePackageServer) CreateLink(context.Context, *CreateLinkReq
 }
 func (UnimplementedPagePackageServer) UpdateLink(context.Context, *PageLinks) (*VoidResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateLink not implemented")
+}
+func (UnimplementedPagePackageServer) DeleteLink(context.Context, *IdRequest) (*VoidResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLink not implemented")
 }
 func (UnimplementedPagePackageServer) CreateMetaLink(context.Context, *Meta) (*Meta, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMetaLink not implemented")
@@ -322,6 +336,24 @@ func _PagePackage_UpdateLink_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PagePackage_DeleteLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PagePackageServer).DeleteLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/page_package.PagePackage/DeleteLink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PagePackageServer).DeleteLink(ctx, req.(*IdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PagePackage_CreateMetaLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Meta)
 	if err := dec(in); err != nil {
@@ -410,6 +442,10 @@ var PagePackage_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateLink",
 			Handler:    _PagePackage_UpdateLink_Handler,
+		},
+		{
+			MethodName: "DeleteLink",
+			Handler:    _PagePackage_DeleteLink_Handler,
 		},
 		{
 			MethodName: "CreateMetaLink",
