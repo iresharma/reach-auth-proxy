@@ -20,8 +20,15 @@ type Auth struct {
 	Salt          string
 	Perm          string
 	UserAccountId string
+	IsVerified    bool `gorm:"default:false"`
 	MetadataId    *string
 	SettingsId    *string
+}
+
+type EmailVerify struct {
+	gorm.Model
+	Id     string `gorm:"primaryKey"`
+	AuthId string
 }
 
 type Metadata struct {
@@ -69,7 +76,7 @@ func CreateConnection() *gorm.DB {
 		panic("Cannot connect to database")
 	}
 
-	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{}, &Settings{}, &Metadata{})
+	err = db.AutoMigrate(&UserAccount{}, &Auth{}, &Session{}, &UserAccountInviteCode{}, &Settings{}, &Metadata{}, &EmailVerify{})
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -96,6 +103,21 @@ func GetAuthFromEmail(email string) Auth {
 	if err := DB.First(&authItem, "email = ?", email).Error; err != nil {
 	}
 	return authItem
+}
+
+func CreateVerifyToken(authId string, token string) string {
+	tokenItem := EmailVerify{
+		Id:     token,
+		AuthId: authId,
+	}
+	if err := DB.Create(&tokenItem).Error; err != nil {
+		//	no-op
+	}
+	return token
+}
+
+func VerifyUser(token string, authId string) bool {
+	return false
 }
 
 func CreateSession(authId string) Session {

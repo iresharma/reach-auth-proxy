@@ -1,0 +1,13 @@
+Verify Your Identity
+
+
+ENTER THE FOLLOWING CODE TO FINISH EMAIL VERIFICATION.
+
+{token}
+
+Not expecting this email?
+
+Contact me@iresharma.com [iresh.sharma8@gmail.com] if you did not request this
+code.
+
+Securely powered by Reach.

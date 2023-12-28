@@ -1,10 +1,11 @@
 package routes
 
 import (
-	database "awesomeProject/internal/pkg/database"
-	redis "awesomeProject/internal/pkg/redis"
-	permissions "awesomeProject/internal/pkg/server/permissions"
-	utils "awesomeProject/internal/pkg/server/utils"
+	"awesomeProject/internal/pkg/database"
+	"awesomeProject/internal/pkg/mail"
+	"awesomeProject/internal/pkg/redis"
+	"awesomeProject/internal/pkg/server/permissions"
+	"awesomeProject/internal/pkg/server/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -104,7 +105,6 @@ func createSession(c *gin.Context) {
 func validSession(c *gin.Context) {
 	sessionToken := c.Request.Header["X-Session"][0]
 	authId := c.Request.Header["X-Auth"][0]
-	fmt.Println(sessionToken, authId)
 	cacheResp, err := redis.FetchSessionCache(sessionToken)
 	if err != nil {
 		c.String(http.StatusUnauthorized, "Not Allowed")
@@ -115,6 +115,14 @@ func validSession(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, "true")
+}
+
+func emailVerifyTokenCreate(c *gin.Context) {
+	authId := c.Request.Header["X-Auth"][0]
+	auth := database.GetAuthUserFromId(authId)
+	token := utils.GenerateSalt()
+	database.CreateVerifyToken(authId, token)
+	mail.SendMail(mail.Params{To: auth.Email, Template: "verify", Subject: "Verify your email"}, map[string]string{"token": token})
 }
 
 func addPermissions(c *gin.Context) {
