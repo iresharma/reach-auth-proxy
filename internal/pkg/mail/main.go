@@ -39,7 +39,7 @@ func readTemplate(template string) (string, string) {
 }
 
 func SendMail(input Params, data map[string]string) {
-	client := resend.NewClient(os.Getenv("resend_api"))
+	client := resend.NewClient(os.Getenv("RESEND_API"))
 	htmlStr, textStr := readTemplate(input.Template)
 	for k, v := range data {
 		log.Println(v)

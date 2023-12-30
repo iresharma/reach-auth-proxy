@@ -14,60 +14,60 @@ var DB *gorm.DB = nil
 
 type Auth struct {
 	gorm.Model
-	Id            string `gorm:"primaryKey"`
-	Email         string `gorm:"unique"`
-	PasswordHash  string
-	Salt          string
-	Perm          string
-	UserAccountId string
-	IsVerified    bool `gorm:"default:false"`
-	MetadataId    *string
-	SettingsId    *string
+	Id            string  `gorm:"primaryKey" json:"Id,omitempty"`
+	Email         string  `gorm:"unique" json:"Email,omitempty"`
+	PasswordHash  string  `json:"PasswordHash,omitempty"`
+	Salt          string  `json:"Salt,omitempty"`
+	Perm          string  `json:"Perm,omitempty"`
+	UserAccountId string  `json:"UserAccountId,omitempty"`
+	IsVerified    bool    `gorm:"default:false" json:"IsVerified,omitempty"`
+	MetadataId    *string `json:"MetadataId,omitempty"`
+	SettingsId    *string `json:"SettingsId,omitempty"`
 }
 
 type EmailVerify struct {
 	gorm.Model
-	Id     string `gorm:"primaryKey"`
-	AuthId string
+	Id     string `gorm:"primaryKey" json:"Id,omitempty"`
+	AuthId string `json:"AuthId,omitempty"`
 }
 
 type Metadata struct {
 	gorm.Model
-	Id       string
-	Name     string
-	PhotoUrl string
+	Id       string `json:"Id,omitempty"`
+	Name     string `json:"Name,omitempty"`
+	PhotoUrl string `json:"PhotoUrl,omitempty"`
 }
 
 type Settings struct {
 	gorm.Model
-	Id string
+	Id string `json:"Id,omitempty"`
 }
 
 type UserAccount struct {
 	gorm.Model
-	Id          string `gorm:"primaryKey"`
-	AccountName string
-	Email       string
-	PhotoUrl    string
-	Users       []Auth
-	Owner       string
-	PageId      string
-	BucketId    string
-	BoardId     string
+	Id          string `gorm:"primaryKey" json:"Id,omitempty"`
+	AccountName string `json:"AccountName,omitempty"`
+	Email       string `json:"Email,omitempty"`
+	PhotoUrl    string `json:"PhotoUrl,omitempty"`
+	Users       []Auth `json:"Users,omitempty"`
+	Owner       string `json:"Owner,omitempty"`
+	PageId      string `json:"PageId,omitempty"`
+	BucketId    string `json:"BucketId,omitempty"`
+	BoardId     string `json:"BoardId,omitempty"`
 }
 
 type Session struct {
 	gorm.Model
-	Id     string `gorm:"primaryKey"`
-	AuthId string
-	Auth   Auth
+	Id     string `gorm:"primaryKey" json:"Id,omitempty"`
+	AuthId string `json:"AuthId,omitempty"`
+	Auth   Auth   `json:"Auth,omitempty"`
 }
 
 type UserAccountInviteCode struct {
 	gorm.Model
-	Id            string `gorm:"primaryKey"`
-	Code          string
-	UserAccountId string
+	Id            string `gorm:"primaryKey" json:"Id,omitempty"`
+	Code          string `json:"Code,omitempty"`
+	UserAccountId string `json:"UserAccountId,omitempty"`
 }
 
 func CreateConnection() *gorm.DB {
