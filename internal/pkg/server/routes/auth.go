@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -122,7 +123,19 @@ func emailVerifyTokenCreate(c *gin.Context) {
 	auth := database.GetAuthUserFromId(authId)
 	token := utils.GenerateSalt()
 	database.CreateVerifyToken(authId, token)
-	mail.SendMail(mail.Params{To: auth.Email, Template: "verify", Subject: "Verify your email"}, map[string]string{"token": token})
+	mail.SendMail(mail.Params{To: auth.Email, Template: "verify", Subject: "Verify your email"}, map[string]string{"token": os.Getenv("BASE_URL" + "/user/verify/consume/" + token)})
+	c.String(http.StatusOK, "OK")
+}
+
+func emailVerifyTokenConsume(c *gin.Context) {
+	token := c.Param("token")
+	fmt.Println(token)
+	// yoyohoneysingh --- Nittu was here
+	verify := database.VerifyUser(token)
+	if !verify {
+		c.String(http.StatusBadRequest, "Email verification failed")
+	}
+	c.Redirect(http.StatusPermanentRedirect, os.Getenv("APP_URL"))
 }
 
 func addPermissions(c *gin.Context) {

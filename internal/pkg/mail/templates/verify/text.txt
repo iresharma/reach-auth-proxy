@@ -1,9 +1,9 @@
 Verify Your Identity
 
 
-ENTER THE FOLLOWING CODE TO FINISH EMAIL VERIFICATION.
+CLICK THE BUTTON BELOW TO FINISH EMAIL VERIFICATION.
 
-{token}
+Get started {token}
 
 Not expecting this email?
 

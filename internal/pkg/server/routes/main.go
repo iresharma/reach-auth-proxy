@@ -11,6 +11,7 @@ func CreateRoutes(r *gin.Engine) {
 	r.POST("/user", createAuth)
 	r.PUT("/user/perm", addPermissions)
 	r.GET("/user/verify/create", emailVerifyTokenCreate)
+	r.GET("/user/verify/consume/:token", emailVerifyTokenConsume)
 	// --------------------- User Account endpoints
 	r.POST("/userAccount", createUserAccount)
 	r.GET("/userAccount", getUserAccount)

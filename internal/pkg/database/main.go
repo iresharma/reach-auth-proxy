@@ -111,13 +111,23 @@ func CreateVerifyToken(authId string, token string) string {
 		AuthId: authId,
 	}
 	if err := DB.Create(&tokenItem).Error; err != nil {
-		//	no-op
+		fmt.Println(err)
 	}
 	return token
 }
 
-func VerifyUser(token string, authId string) bool {
-	return false
+func VerifyUser(token string) bool {
+	var emailVerify EmailVerify
+	if err := DB.First(&emailVerify, "id = ?", token).Error; err != nil {
+		fmt.Println(err)
+		return false
+	}
+	fmt.Println(emailVerify)
+	if err := DB.Model(&Auth{}).Where("id = ?", emailVerify.AuthId).Update("is_verified", true).Error; err != nil {
+		fmt.Println(err)
+		return false
+	}
+	return true
 }
 
 func CreateSession(authId string) Session {
