@@ -285,8 +285,13 @@ func CreateMetaData(name string, photoUrl *string, authId string) (*string, *str
 	return &metaDataId, nil
 }
 
-func UpdateMetadata(metadataId string, name string, photoUrl string) {
+func UpdateMetadata(authId string, name string, photoUrl string) {
 	metaData := Metadata{}
+	var auth Auth
+	if err := DB.First(&auth, "id = ?", authId).Error; err != nil {
+		log.Println(err)
+		return
+	}
 	if name != "" {
 		metaData.Name = name
 	}
@@ -294,7 +299,7 @@ func UpdateMetadata(metadataId string, name string, photoUrl string) {
 		metaData.PhotoUrl = photoUrl
 	}
 	if name != "" && photoUrl != "" {
-		if err := DB.Model(&Metadata{}).Where("id = ?", metadataId).Updates(metaData).Error; err != nil {
+		if err := DB.Model(&Metadata{}).Where("id = ?", auth.MetadataId).Updates(metaData).Error; err != nil {
 			fmt.Println(err)
 			panic("shit")
 		}

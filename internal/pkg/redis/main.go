@@ -48,7 +48,6 @@ func FetchSessionCache(sessionId string) (*map[string]string, *string) {
 	ctx := context.Background()
 	authId, err := Rdb.Get(ctx, sessionId).Result()
 	if err != nil {
-		fmt.Println(err)
 		return database.FetchSessionDB(sessionId)
 	}
 	perm, err := Rdb.Get(ctx, sessionId+":"+authId).Result()

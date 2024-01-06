@@ -356,9 +356,9 @@ func updateMetaData(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Form body not found")
 		return
 	}
-	metaDataId := request.Header.Get("X-MetaData")
 	formData := c.Request.Form
+	authId := c.Request.Header.Get("X-Auth")
 	name := formData.Get("name")
 	photoUrl := formData.Get("photoUrl")
-	database.UpdateMetadata(metaDataId, name, photoUrl)
+	database.UpdateMetadata(authId, name, photoUrl)
 }
