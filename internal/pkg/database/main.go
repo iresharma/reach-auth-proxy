@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 	"os"
 )
 
@@ -298,6 +299,20 @@ func UpdateMetadata(metadataId string, name string, photoUrl string) {
 			panic("shit")
 		}
 	}
+}
+
+func FetchAuthWithMetadata(authId string) (*Auth, *Metadata) {
+	var auth Auth
+	var metaData Metadata
+	if err := DB.First(&auth, "id = ?", authId).Error; err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+	if err := DB.First(&metaData, "id = ?", auth.MetadataId).Error; err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+	return &auth, &metaData
 }
 
 func GenerateUserAccountJoinToken(userAccountId string) (*string, *string) {

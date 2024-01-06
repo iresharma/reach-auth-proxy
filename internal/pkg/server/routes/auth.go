@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"awesomeProject/internal/pkg/RPC"
 	"awesomeProject/internal/pkg/database"
 	"awesomeProject/internal/pkg/mail"
 	"awesomeProject/internal/pkg/redis"
@@ -283,6 +284,29 @@ func verifyInviteToken(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, "User Added")
+}
+
+func getAuthWithMetadata(c *gin.Context) {
+	request := c.Request
+	sessionResponse := utils.ValidateSession(request)
+	if sessionResponse.HttpStatus != nil {
+		c.String(*sessionResponse.HttpStatus, *sessionResponse.Response)
+		return
+	}
+	authId := request.Header.Get("X-Auth")
+	auth, metadata := database.FetchAuthWithMetadata(authId)
+	if auth == nil || metadata == nil {
+		c.String(http.StatusInternalServerError, "Error fetching data")
+	}
+	authMap := RPC.StructToMap(auth)
+	metadataMap := RPC.StructToMap(metadata)
+	delete(authMap, "Model")
+	delete(metadataMap, "Model")
+	delete(authMap, "PasswordHash")
+	delete(authMap, "MetadataId")
+	delete(authMap, "Salt")
+	authMap["Metadata"] = metadataMap
+	c.JSON(http.StatusOK, authMap)
 }
 
 func createMetadata(c *gin.Context) {

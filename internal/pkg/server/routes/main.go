@@ -23,6 +23,7 @@ func CreateRoutes(r *gin.Engine) {
 	r.POST("/session", createSession)
 	r.GET("/session", validSession)
 	// --------------------- User MetaData endpoints
+	r.GET("/metadata", getAuthWithMetadata)
 	r.POST("/metadata", createMetadata)
 	r.PATCH("/metadata", updateMetaData)
 	// --------------------- Kanban endpoints
