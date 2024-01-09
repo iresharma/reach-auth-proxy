@@ -124,7 +124,7 @@ func emailVerifyTokenCreate(c *gin.Context) {
 	auth := database.GetAuthUserFromId(authId)
 	token := utils.GenerateSalt()
 	database.CreateVerifyToken(authId, token)
-	mail.SendMail(mail.Params{To: auth.Email, Template: "verify", Subject: "Verify your email"}, map[string]string{"token": os.Getenv("BASE_URL" + "/user/verify/consume/" + token)})
+	mail.SendMail(mail.Params{To: auth.Email, Template: "verify", Subject: "Verify your email"}, map[string]string{"token": os.Getenv("BASE_URL") + "/user/verify/consume/" + token})
 	c.String(http.StatusOK, "OK")
 }
 

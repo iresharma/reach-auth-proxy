@@ -298,11 +298,9 @@ func UpdateMetadata(authId string, name string, photoUrl string) {
 	if photoUrl != "" {
 		metaData.PhotoUrl = photoUrl
 	}
-	if name != "" && photoUrl != "" {
-		if err := DB.Model(&Metadata{}).Where("id = ?", auth.MetadataId).Updates(metaData).Error; err != nil {
-			fmt.Println(err)
-			panic("shit")
-		}
+	if err := DB.Model(&Metadata{}).Where("id = ?", auth.MetadataId).Updates(metaData).Error; err != nil {
+		fmt.Println(err)
+		panic("shit")
 	}
 }
 

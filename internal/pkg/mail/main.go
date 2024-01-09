@@ -1,7 +1,9 @@
 package mail
 
 import (
+	"bytes"
 	"github.com/resend/resend-go/v2"
+	"html/template"
 	"log"
 	"os"
 	"path/filepath"
@@ -18,16 +20,17 @@ var emailMap = map[string]string{
 	"verify": "internal/pkg/mail/templates/verify/",
 }
 
-func readTemplate(template string) (string, string) {
-	htmlPath, err := filepath.Abs(emailMap[template] + "index.html")
-	if err != nil {
-		log.Println("template path mess up")
+func readTemplate(emailTemplate string) (string, string) {
+	var bf bytes.Buffer
+	htmlPath, err := filepath.Abs(emailMap[emailTemplate] + "index.html")
+	tmpl := template.Must(template.ParseFiles(htmlPath))
+	textPath, err := filepath.Abs(emailMap[emailTemplate] + "text.txt")
+
+	if err := tmpl.Execute(&bf, nil); err != nil {
+		panic(err)
 	}
-	html, err := os.ReadFile(htmlPath)
-	if err != nil {
-		log.Println("failed to read plain text")
-	}
-	textPath, err := filepath.Abs(emailMap[template] + "text.txt")
+
+	htmlStr := bf.String()
 	if err != nil {
 		log.Println("template path mess up")
 	}
@@ -35,7 +38,7 @@ func readTemplate(template string) (string, string) {
 	if err != nil {
 		log.Println("failed to read plain text")
 	}
-	return string(html), string(text)
+	return htmlStr, string(text)
 }
 
 func SendMail(input Params, data map[string]string) {
@@ -43,7 +46,6 @@ func SendMail(input Params, data map[string]string) {
 	htmlStr, textStr := readTemplate(input.Template)
 	for k, v := range data {
 		log.Println(v)
-		log.Println("{" + k + "}")
 		htmlStr = strings.ReplaceAll(htmlStr, "{"+k+"}", v)
 		textStr = strings.ReplaceAll(textStr, "{"+k+"}", v)
 	}
