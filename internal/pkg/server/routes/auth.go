@@ -136,7 +136,7 @@ func emailVerifyTokenConsume(c *gin.Context) {
 	if !verify {
 		c.String(http.StatusBadRequest, "Email verification failed")
 	}
-	c.Redirect(http.StatusPermanentRedirect, os.Getenv("APP_URL"))
+	c.Redirect(http.StatusPermanentRedirect, os.Getenv("APP_URL")+"/auth/userInfo")
 }
 
 func addPermissions(c *gin.Context) {
