@@ -15,6 +15,10 @@ import (
 	"strings"
 )
 
+func getPermissions(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"permissions": permissions.ServiceToPermissionMap})
+}
+
 func statusCheck(c *gin.Context) {
 	c.String(200, "I'm up and protecting")
 }

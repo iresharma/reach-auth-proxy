@@ -6,6 +6,8 @@ import (
 
 func CreateRoutes(r *gin.Engine) {
 	r.GET("/", statusCheck)
+	// --------------------- Permissions endpoints
+	r.GET("/permissions", getPermissions)
 	// --------------------- User endpoints
 	r.GET("/user", checkEmailExist)
 	r.POST("/user", createAuth)

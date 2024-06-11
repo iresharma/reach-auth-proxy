@@ -15,6 +15,8 @@ func Run() {
 	config.AllowHeaders = []string{"X-Auth", "X-Session", "X-UserAccount", "X-Board", "X-Page", "X-MataData"}
 	config.AllowAllOrigins = true
 	r.Use(cors.New(config))
+	r.Use(gin.Recovery())
+	r.Use(permissions.PermMiddleware)
 	routes.CreateRoutes(r)
 	database.DB = database.CreateConnection()
 	redis.Rdb = redis.InitRedis()
