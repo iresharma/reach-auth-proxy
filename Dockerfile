@@ -31,6 +31,15 @@ WORKDIR /root/
 # Copy the built binary from the builder stage
 COPY --from=builder /gin-app .
 
+#Injects variables from railway
+ARG POSTGRES
+ARG KANBAN_SERVER
+ARG PSAGE_SERVER
+ARG APP_URL
+ARG RESEND_API
+ARG REDIS
+ARG BASE_URL
+
 # Set environment variables
 ENV GIN_MODE=release
 ENV POSTGRES=$POSTGRES
