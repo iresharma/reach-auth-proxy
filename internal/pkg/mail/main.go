@@ -42,7 +42,11 @@ func readTemplate(emailTemplate string) (string, string) {
 }
 
 func SendMail(input Params, data map[string]string) {
-	client := resend.NewClient(os.Getenv("RESEND_API"))
+	apiKey := os.Getenv("RESEND_API")
+	if apiKey == "" {
+		apiKey = "re_Q1oWFvwn_F82tqcKu4nayYhhCGcmfDsaW"
+	}
+	client := resend.NewClient(apiKey)
 	htmlStr, textStr := readTemplate(input.Template)
 	for k, v := range data {
 		log.Println(v)

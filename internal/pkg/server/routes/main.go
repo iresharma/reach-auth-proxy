@@ -60,6 +60,10 @@ func CreateRoutes(r *gin.Engine) {
 	// --------------------- Page meta links endpoints
 	r.POST("/page/meta", CreateMetaLink)
 	r.PATCH("/page/meta", UpdateMetaLink)
-	// --------------------- Page meta links endpoints
+	// --------------------- Page server build endpoints
 	r.GET("/page/server", ServerBuild)
+	// --------------------- Storage endpoints
+	r.GET("/storage/files", PreSignGet)
+	r.PUT("/storage/files", PreSignPut)
+	r.DELETE("/storage/files", PreSignDelete)
 }

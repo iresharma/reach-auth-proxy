@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+package file_server_package;
+
+service FileServerPackage {
+  rpc InitializeFileServer(InitServerRequest) returns (InitServerResponse);
+  rpc GetServerInfo(GetServerRequest) returns (GetServerResponse);
+  rpc ListFile(ListFileRequest) returns (ListFileResponse);
+  rpc PreSignedGet(FileOperationRequest) returns (GetFileResponse);
+  rpc PreSignedDelete(FileOperationRequest) returns (OkResponse);
+  rpc PreSignedPut(FileOperationRequest) returns (GetFileResponse);
+}
+
+// =============== Data Models ===============
+
+message InitServerRequest {
+  string userAccount = 1;
+}
+
+message GetServerRequest {
+  string bucketId = 1;
+}
+
+message FileOperationRequest {
+  string path = 1;
+  string bucketId = 2;
+}
+
+message ListFileRequest {
+  string bucketId = 1;
+  string path = 2;
+}
+
+message GetFileRequest {
+  string userAccountId = 1;
+  string path = 2;
+}
+
+message GetFileResponse {
+  string getUrl = 1;
+}
+
+message InitServerResponse {
+  string id = 1;
+}
+
+message GetServerResponse {
+  string bucketName = 1;
+  BucketMetaData metadata = 2;
+}
+
+message BucketMetaData {
+  string size = 1;
+  string name = 2;
+  string creationDate = 3;
+  int32 count = 4;
+}
+
+message File {
+  float lastModified = 1;
+  string filename = 2;
+  string size = 3;
+}
+
+message ListFileResponse {
+  repeated File files = 1;
+  repeated string folder = 2;
+}
+
+message OkResponse {
+  string status = 1;
+}

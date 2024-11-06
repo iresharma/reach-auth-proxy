@@ -20,7 +20,7 @@ COPY . .
 WORKDIR /app/cmd
 
 # Build the Go application
-RUN go build -o /gin-app .
+RUN go build -o /reach-proxy .
 
 # Stage 2: Create a smaller image with just the built binary
 FROM alpine:latest
@@ -28,30 +28,8 @@ FROM alpine:latest
 # Set the working directory
 WORKDIR /root/
 
-# Copy the built binary from the builder stage
-COPY --from=builder /gin-app .
-
-#Injects variables from railway
-ARG POSTGRES
-ARG KANBAN_SERVER
-ARG PAGE_SERVER
-ARG APP_URL
-ARG RESEND_API
-ARG REDIS
-ARG BASE_URL
-
-# Set environment variables
-ENV GIN_MODE=release
-ENV POSTGRES=$POSTGRES
-ENV KANBAN_SERVER=$KANBAN_SERVER
-ENV PAGE_SERVER=$PAGE_SERVER
-ENV APP_URL=$APP_URL
-ENV RESEND_API=$RESEND_API
-ENV REDIS=$REDIS
-ENV BASE_URL=$BASE_URL
-
 # Expose the port the application runs on
 EXPOSE 8080
 
 # Command to run the application
-CMD ["./gin-app"]
+CMD ["./reach-proxy"]

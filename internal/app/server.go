@@ -12,7 +12,7 @@ import (
 func Run() {
 	r := gin.Default()
 	config := cors.DefaultConfig()
-	config.AllowHeaders = []string{"X-Auth", "X-Session", "X-UserAccount", "X-Board", "X-Page", "X-MataData"}
+	config.AllowHeaders = []string{"X-Auth", "X-Session", "X-UserAccount", "X-Board", "X-Page", "X-MetaData"}
 	config.AllowAllOrigins = true
 	r.Use(cors.New(config))
 	r.Use(gin.Recovery())
