@@ -24,7 +24,7 @@ func CreateStorageClient() (storageProto.FileServerPackageClient, *grpc.ClientCo
 }
 
 func GetPreSigned(userAccountId string, path string) storageProto.GetFileResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client, conn := CreateStorageClient()
@@ -43,7 +43,7 @@ func GetPreSigned(userAccountId string, path string) storageProto.GetFileRespons
 }
 
 func PutPreSigned(userAccountId string, path string) storageProto.GetFileResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client, conn := CreateStorageClient()
@@ -62,7 +62,7 @@ func PutPreSigned(userAccountId string, path string) storageProto.GetFileRespons
 }
 
 func DeletePreSigned(userAccountId string, path string) storageProto.OkResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	client, conn := CreateStorageClient()

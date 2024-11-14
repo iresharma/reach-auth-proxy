@@ -61,7 +61,7 @@ func createLabel(c *gin.Context) {
 	body := c.Request.Form
 	fmt.Println(body)
 	res := kanban.AddLabel(body.Get("board"), body.Get("color"), body.Get("label"))
-	redis.DeleteFromRedis(body.Get("board") + ":limit")
+	redis.DeleteFromRedis(body.Get("board") + ":Labels")
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 

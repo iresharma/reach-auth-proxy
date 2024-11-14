@@ -26,7 +26,7 @@ func CreateKanbanClient() (kanbanProto.KanbanPackageClient, *grpc.ClientConn) {
 }
 
 func CreateKanban(userAccountId string) kanbanProto.BoardResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -43,7 +43,7 @@ func CreateKanban(userAccountId string) kanbanProto.BoardResponse {
 }
 
 func AddLabel(boardId string, color string, label string) kanbanProto.Label {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -63,7 +63,7 @@ func AddLabel(boardId string, color string, label string) kanbanProto.Label {
 }
 
 func AddItem(body url.Values, board string, auth string) kanbanProto.Item {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -107,7 +107,7 @@ func AddItem(body url.Values, board string, auth string) kanbanProto.Item {
 }
 
 func GetLabels(board_id string) kanbanProto.GetLabelsResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -124,7 +124,7 @@ func GetLabels(board_id string) kanbanProto.GetLabelsResponse {
 }
 
 func Getlabel(label_id string) kanbanProto.Label {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -142,7 +142,7 @@ func Getlabel(label_id string) kanbanProto.Label {
 }
 
 func GetItems(page int, limit int, boardId string) kanbanProto.GetItemResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -162,7 +162,7 @@ func GetItems(page int, limit int, boardId string) kanbanProto.GetItemResponse {
 }
 
 func GetItem(task_id string) kanbanProto.Item {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -180,7 +180,7 @@ func GetItem(task_id string) kanbanProto.Item {
 }
 
 func UpdateItem(vals url.Values) kanbanProto.Item {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -233,7 +233,7 @@ func UpdateItem(vals url.Values) kanbanProto.Item {
 }
 
 func DeleteItem(itemId string) kanbanProto.VoidResp {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -251,7 +251,7 @@ func DeleteItem(itemId string) kanbanProto.VoidResp {
 }
 
 func ExportBoard(boardId string) kanbanProto.ExportResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -269,7 +269,7 @@ func ExportBoard(boardId string) kanbanProto.ExportResponse {
 }
 
 func AddComment(message string, itemId string, userId string) kanbanProto.Comment {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -289,7 +289,7 @@ func AddComment(message string, itemId string, userId string) kanbanProto.Commen
 }
 
 func UpdateComment(message string, commentId string) kanbanProto.Comment {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()
@@ -308,7 +308,7 @@ func UpdateComment(message string, commentId string) kanbanProto.Comment {
 }
 
 func DeleteComment(id string) kanbanProto.VoidResp {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
 	defer conn.Close()

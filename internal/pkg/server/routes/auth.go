@@ -130,7 +130,7 @@ func emailVerifyTokenCreate(c *gin.Context) {
 	_, err := utils.SendMail(map[string]string{
 		"email":    auth.Email,
 		"template": "verify",
-		"token":    token,
+		"token":    os.Getenv("BASE_URL") + token,
 		"subject":  "Reach: Verify you email",
 	})
 	if err != nil {

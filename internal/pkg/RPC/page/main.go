@@ -24,7 +24,7 @@ func CreatePageClient() (pageProto.PagePackageClient, *grpc.ClientConn) {
 }
 
 func ServerBuild() pageProto.ServerBuildResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -39,7 +39,7 @@ func ServerBuild() pageProto.ServerBuildResponse {
 }
 
 func CreatePage(userAccountId string, route string) pageProto.PageResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -57,7 +57,7 @@ func CreatePage(userAccountId string, route string) pageProto.PageResponse {
 }
 
 func GetPage(id string) pageProto.Page {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -74,7 +74,7 @@ func GetPage(id string) pageProto.Page {
 }
 
 func GetPageId(id string) pageProto.Page {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -91,7 +91,7 @@ func GetPageId(id string) pageProto.Page {
 }
 
 func CreateTemplate(Name string, Desc string, Image string, Button string, Background string, Font string, FontColor string, PageId string, Social bool, SocialPosition string) pageProto.Template {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -117,7 +117,7 @@ func CreateTemplate(Name string, Desc string, Image string, Button string, Backg
 }
 
 func UpdateTemplate(Name string, Desc string, Image string, Button string, Background string, Font string, FontColor string, PageId string, Social bool, SocialPosition string) pageProto.VoidResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -143,7 +143,7 @@ func UpdateTemplate(Name string, Desc string, Image string, Button string, Backg
 }
 
 func CreateLink(pageId string, name string, link string, icon string, social bool, sequence int) pageProto.PageLinks {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -165,7 +165,7 @@ func CreateLink(pageId string, name string, link string, icon string, social boo
 }
 
 func UpdateLink(pageId string, id string, name string, link string, icon string, social bool, sequence int) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -187,7 +187,7 @@ func UpdateLink(pageId string, id string, name string, link string, icon string,
 }
 
 func DeleteLink(linkID string) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -203,7 +203,7 @@ func DeleteLink(linkID string) {
 }
 
 func CreateMetaLinks(templateId string, name string, value string) pageProto.Meta {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
@@ -222,7 +222,7 @@ func CreateMetaLinks(templateId string, name string, value string) pageProto.Met
 }
 
 func UpdateMetaLink(id string, templateId string, name string, value string) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
 	defer conn.Close()
