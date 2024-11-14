@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"net/url"
+	"os"
 	"regexp"
 	"unicode"
 )
@@ -106,4 +108,35 @@ func ValidateSession(request *http.Request) SessionValidateResponse {
 	}
 	perm := (*cacheResp)["Perm"]
 	return SessionValidateResponse{Perm: &perm}
+}
+
+func SendMail(params map[string]string) (*http.Response, error) {
+	// Create the base URL
+	baseURL := os.Getenv("MAILING_SERVER") + "/verify/mail"
+
+	// Parse the URL
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse URL: %v", err)
+	}
+
+	// Create query parameters
+	q := u.Query()
+	for key, value := range params {
+		q.Add(key, value)
+	}
+
+	// Set the query parameters back to the URL
+	u.RawQuery = q.Encode()
+
+	// Create a new HTTP client
+	client := &http.Client{}
+
+	// Make the GET request
+	resp, err := client.Get(u.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %v", err)
+	}
+
+	return resp, nil
 }

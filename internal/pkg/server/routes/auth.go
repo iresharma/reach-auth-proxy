@@ -3,7 +3,6 @@ package routes
 import (
 	"awesomeProject/internal/pkg/RPC"
 	"awesomeProject/internal/pkg/database"
-	"awesomeProject/internal/pkg/mail"
 	"awesomeProject/internal/pkg/redis"
 	"awesomeProject/internal/pkg/server/permissions"
 	"awesomeProject/internal/pkg/server/utils"
@@ -128,7 +127,16 @@ func emailVerifyTokenCreate(c *gin.Context) {
 	auth := database.GetAuthUserFromId(authId)
 	token := utils.GenerateSalt()
 	database.CreateVerifyToken(authId, token)
-	mail.SendMail(mail.Params{To: auth.Email, Template: "verify", Subject: "Verify your email"}, map[string]string{"token": os.Getenv("BASE_URL") + "/user/verify/consume/" + token})
+	_, err := utils.SendMail(map[string]string{
+		"email":    auth.Email,
+		"template": "verify",
+		"token":    token,
+		"subject":  "Reach: Verify you email",
+	})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	c.String(http.StatusOK, "OK")
 }
 
