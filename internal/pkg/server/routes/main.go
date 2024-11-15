@@ -63,6 +63,7 @@ func CreateRoutes(r *gin.Engine) {
 	// --------------------- Page server build endpoints
 	r.GET("/page/server", ServerBuild)
 	// --------------------- Storage endpoints
+	r.POST("/storage", InitializeStorage)
 	r.GET("/storage/files", PreSignGet)
 	r.PUT("/storage/files", PreSignPut)
 	r.DELETE("/storage/files", PreSignDelete)
