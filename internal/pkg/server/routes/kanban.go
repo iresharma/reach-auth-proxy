@@ -94,8 +94,16 @@ func GetLabel(c *gin.Context) {
 		return
 	}
 	query := c.Query("label_id")
+	resCache := redis.GetItemFromRedis("label:" + query)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.Getlabel(query)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis("label:"+query, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func createItem(c *gin.Context) {
@@ -162,8 +170,16 @@ func getItem(c *gin.Context) {
 		return
 	}
 	task_id := c.Query("id")
+	resCache := redis.GetItemFromRedis("item:" + task_id)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.GetItem(task_id)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis("item:"+task_id, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func updateItem(c *gin.Context) {
@@ -181,6 +197,7 @@ func updateItem(c *gin.Context) {
 	body := c.Request.Form
 	res := kanban.UpdateItem(body)
 	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
+	redis.DeleteFromRedis("item:" + body.Get("id"))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -199,6 +216,7 @@ func DeleteItem(c *gin.Context) {
 	body := c.Request.Form.Get("id")
 	kanban.DeleteItem(body)
 	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
+	redis.DeleteFromRedis("item:" + body)
 	c.String(http.StatusOK, "Item deleted")
 }
 
