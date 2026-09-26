@@ -6,11 +6,13 @@ import (
 	database "awesomeProject/internal/pkg/database"
 	redis "awesomeProject/internal/pkg/redis"
 	"awesomeProject/internal/pkg/server/utils"
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func createKanban(c *gin.Context) {
@@ -35,6 +37,7 @@ func createKanban(c *gin.Context) {
 	}
 	//permArr := strings.Split((*cacheResp)["perm"], ";")
 	res := kanban.CreateKanban(userAccount)
+	redis.DeleteFromRedis(userAccount + ":kanban")
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -94,8 +97,17 @@ func GetLabel(c *gin.Context) {
 		return
 	}
 	query := c.Query("label_id")
+	cacheKey := "label:" + query
+	resCache := redis.GetItemFromRedis(cacheKey)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.Getlabel(query)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(cacheKey, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func createItem(c *gin.Context) {
@@ -162,8 +174,17 @@ func getItem(c *gin.Context) {
 		return
 	}
 	task_id := c.Query("id")
+	cacheKey := "item:" + task_id
+	resCache := redis.GetItemFromRedis(cacheKey)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.GetItem(task_id)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(cacheKey, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func updateItem(c *gin.Context) {
@@ -181,6 +202,7 @@ func updateItem(c *gin.Context) {
 	body := c.Request.Form
 	res := kanban.UpdateItem(body)
 	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
+	redis.DeleteFromRedis("item:" + body.Get("id"))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -199,6 +221,7 @@ func DeleteItem(c *gin.Context) {
 	body := c.Request.Form.Get("id")
 	kanban.DeleteItem(body)
 	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
+	redis.DeleteFromRedis("item:" + body)
 	c.String(http.StatusOK, "Item deleted")
 }
 
@@ -215,8 +238,17 @@ func exportKanban(c *gin.Context) {
 		return
 	}
 	boardId := c.Request.Header["X-Board"][0]
+	cacheKey := boardId + ":export"
+	resCache := redis.GetItemFromRedis(cacheKey)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.ExportBoard(boardId)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(cacheKey, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func getKanban(c *gin.Context) {
@@ -227,7 +259,16 @@ func getKanban(c *gin.Context) {
 		return
 	}
 	userAccount := c.Request.Header["X-Useraccount"][0]
-	c.String(http.StatusOK, database.GetKanban(userAccount))
+	cacheKey := userAccount + ":kanban"
+	cached, err := redis.Rdb.Get(context.Background(), cacheKey).Result()
+	if err == nil {
+		c.Header("X-cache", "HIT")
+		c.String(http.StatusOK, cached)
+		return
+	}
+	res := database.GetKanban(userAccount)
+	_ = redis.Rdb.Set(context.Background(), cacheKey, res, 1*86400*time.Second)
+	c.String(http.StatusOK, res)
 }
 
 func AddComment(c *gin.Context) {
@@ -247,6 +288,7 @@ func AddComment(c *gin.Context) {
 	body := request.Form
 	log.Println(body.Get("message"))
 	res := kanban.AddComment(body.Get("message"), itemId, userId)
+	redis.DeleteFromRedis("item:" + itemId)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -263,8 +305,14 @@ func UpdateComment(c *gin.Context) {
 		return
 	}
 	commentId := c.Query("comment_id")
+	itemId := c.Query("item_id")
+	if itemId == "" {
+		c.String(http.StatusBadRequest, "item_id is required")
+		return
+	}
 	body := request.Form
 	res := kanban.UpdateComment(body.Get("message"), commentId)
+	redis.DeleteFromRedis("item:" + itemId)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -281,6 +329,12 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 	commentId := c.Query("comment_id")
+	itemId := c.Query("item_id")
+	if itemId == "" {
+		c.String(http.StatusBadRequest, "item_id is required")
+		return
+	}
 	_ = kanban.DeleteComment(commentId)
+	redis.DeleteFromRedis("item:" + itemId)
 	c.String(http.StatusOK, "OK")
 }
