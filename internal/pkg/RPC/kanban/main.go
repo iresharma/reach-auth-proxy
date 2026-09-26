@@ -25,7 +25,7 @@ func CreateKanbanClient() (kanbanProto.KanbanPackageClient, *grpc.ClientConn) {
 	return client, kanbanConn
 }
 
-func CreateKanban(userAccountId string) kanbanProto.BoardResponse {
+func CreateKanban(userAccountId string) *kanbanProto.BoardResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -39,10 +39,10 @@ func CreateKanban(userAccountId string) kanbanProto.BoardResponse {
 	if err != nil {
 		log.Fatalf("Error creating kanban board")
 	}
-	return *res
+	return res
 }
 
-func AddLabel(boardId string, color string, label string) kanbanProto.Label {
+func AddLabel(boardId string, color string, label string) *kanbanProto.Label {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -59,10 +59,10 @@ func AddLabel(boardId string, color string, label string) kanbanProto.Label {
 		fmt.Print(err)
 		log.Fatalf("Error creating a new label")
 	}
-	return *res
+	return res
 }
 
-func AddItem(body url.Values, board string, auth string) kanbanProto.Item {
+func AddItem(body url.Values, board string, auth string) *kanbanProto.Item {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -103,10 +103,10 @@ func AddItem(body url.Values, board string, auth string) kanbanProto.Item {
 		fmt.Println(err)
 		log.Println("Error creating a new Item")
 	}
-	return *res
+	return res
 }
 
-func GetLabels(board_id string) kanbanProto.GetLabelsResponse {
+func GetLabels(board_id string) *kanbanProto.GetLabelsResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -120,10 +120,10 @@ func GetLabels(board_id string) kanbanProto.GetLabelsResponse {
 		fmt.Println(err)
 		log.Println("Error getting labels")
 	}
-	return *res
+	return res
 }
 
-func Getlabel(label_id string) kanbanProto.Label {
+func Getlabel(label_id string) *kanbanProto.Label {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -138,10 +138,10 @@ func Getlabel(label_id string) kanbanProto.Label {
 		fmt.Println(err)
 		log.Println("Error getting label" + label_id)
 	}
-	return *res
+	return res
 }
 
-func GetItems(page int, limit int, boardId string) kanbanProto.GetItemResponse {
+func GetItems(page int, limit int, boardId string) *kanbanProto.GetItemResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -158,10 +158,10 @@ func GetItems(page int, limit int, boardId string) kanbanProto.GetItemResponse {
 		log.Fatalf(err.Error())
 		log.Fatalf("Error getting items")
 	}
-	return *res
+	return res
 }
 
-func GetItem(task_id string) kanbanProto.Item {
+func GetItem(task_id string) *kanbanProto.Item {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -176,10 +176,10 @@ func GetItem(task_id string) kanbanProto.Item {
 		log.Fatalf(err.Error())
 		log.Fatalf("Error getting items")
 	}
-	return *res
+	return res
 }
 
-func UpdateItem(vals url.Values) kanbanProto.Item {
+func UpdateItem(vals url.Values) *kanbanProto.Item {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -229,10 +229,10 @@ func UpdateItem(vals url.Values) kanbanProto.Item {
 		fmt.Println(err)
 		log.Println("Blah blah")
 	}
-	return *res
+	return res
 }
 
-func DeleteItem(itemId string) kanbanProto.VoidResp {
+func DeleteItem(itemId string) *kanbanProto.VoidResp {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -247,10 +247,10 @@ func DeleteItem(itemId string) kanbanProto.VoidResp {
 		log.Println(err)
 		log.Println("blah blah")
 	}
-	return *res
+	return res
 }
 
-func ExportBoard(boardId string) kanbanProto.ExportResponse {
+func ExportBoard(boardId string) *kanbanProto.ExportResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -265,10 +265,10 @@ func ExportBoard(boardId string) kanbanProto.ExportResponse {
 		log.Println(err)
 		log.Println("blah blah")
 	}
-	return *res
+	return res
 }
 
-func AddComment(message string, itemId string, userId string) kanbanProto.Comment {
+func AddComment(message string, itemId string, userId string) *kanbanProto.Comment {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -285,10 +285,10 @@ func AddComment(message string, itemId string, userId string) kanbanProto.Commen
 		log.Println(err)
 		log.Println("Error while creating comment")
 	}
-	return *res
+	return res
 }
 
-func UpdateComment(message string, commentId string) kanbanProto.Comment {
+func UpdateComment(message string, commentId string) *kanbanProto.Comment {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -304,10 +304,10 @@ func UpdateComment(message string, commentId string) kanbanProto.Comment {
 		log.Println(err)
 		log.Println("Error while creating comment")
 	}
-	return *res
+	return res
 }
 
-func DeleteComment(id string) kanbanProto.VoidResp {
+func DeleteComment(id string) *kanbanProto.VoidResp {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreateKanbanClient()
@@ -322,5 +322,5 @@ func DeleteComment(id string) kanbanProto.VoidResp {
 		log.Println(err)
 		log.Println("Error while creating comment")
 	}
-	return *res
+	return res
 }

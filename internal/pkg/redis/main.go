@@ -77,6 +77,21 @@ func AddItemToRedis(key string, val interface{}) {
 	log.Println(out.Result())
 }
 
+func GetStringFromRedis(key string) (string, bool) {
+	ctx := context.Background()
+	val, err := Rdb.Get(ctx, key).Result()
+	if err != nil {
+		return "", false
+	}
+	return val, true
+}
+
+func AddStringToRedis(key string, val string) {
+	ctx := context.Background()
+	out := Rdb.Set(ctx, key, val, 1*86400*time.Second)
+	log.Println(out.Result())
+}
+
 func DeleteFromRedis(key string) {
 	ctx := context.Background()
 	_ = Rdb.Del(ctx, key)

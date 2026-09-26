@@ -23,7 +23,7 @@ func CreatePageClient() (pageProto.PagePackageClient, *grpc.ClientConn) {
 	return client, pageConn
 }
 
-func ServerBuild() pageProto.ServerBuildResponse {
+func ServerBuild() *pageProto.ServerBuildResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -35,10 +35,10 @@ func ServerBuild() pageProto.ServerBuildResponse {
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
-func CreatePage(userAccountId string, route string) pageProto.PageResponse {
+func CreatePage(userAccountId string, route string) *pageProto.PageResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -53,10 +53,10 @@ func CreatePage(userAccountId string, route string) pageProto.PageResponse {
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
-func GetPage(id string) pageProto.Page {
+func GetPage(id string) *pageProto.Page {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -70,10 +70,10 @@ func GetPage(id string) pageProto.Page {
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
-func GetPageId(id string) pageProto.Page {
+func GetPageId(id string) *pageProto.Page {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -87,10 +87,10 @@ func GetPageId(id string) pageProto.Page {
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
-func CreateTemplate(Name string, Desc string, Image string, Button string, Background string, Font string, FontColor string, PageId string, Social bool, SocialPosition string) pageProto.Template {
+func CreateTemplate(Name string, Desc string, Image string, Button string, Background string, Font string, FontColor string, PageId string, Social bool, SocialPosition string) *pageProto.Template {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -113,10 +113,10 @@ func CreateTemplate(Name string, Desc string, Image string, Button string, Backg
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
-func UpdateTemplate(Name string, Desc string, Image string, Button string, Background string, Font string, FontColor string, PageId string, Social bool, SocialPosition string) pageProto.VoidResponse {
+func UpdateTemplate(Name string, Desc string, Image string, Button string, Background string, Font string, FontColor string, PageId string, Social bool, SocialPosition string) *pageProto.VoidResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -139,10 +139,10 @@ func UpdateTemplate(Name string, Desc string, Image string, Button string, Backg
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
-func CreateLink(pageId string, name string, link string, icon string, social bool, sequence int) pageProto.PageLinks {
+func CreateLink(pageId string, name string, link string, icon string, social bool, sequence int) *pageProto.PageLinks {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -161,7 +161,7 @@ func CreateLink(pageId string, name string, link string, icon string, social boo
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
 func UpdateLink(pageId string, id string, name string, link string, icon string, social bool, sequence int) {
@@ -202,7 +202,7 @@ func DeleteLink(linkID string) {
 	}
 }
 
-func CreateMetaLinks(templateId string, name string, value string) pageProto.Meta {
+func CreateMetaLinks(templateId string, name string, value string) *pageProto.Meta {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	client, conn := CreatePageClient()
@@ -218,7 +218,7 @@ func CreateMetaLinks(templateId string, name string, value string) pageProto.Met
 	if err != nil {
 		log.Println(err)
 	}
-	return *res
+	return res
 }
 
 func UpdateMetaLink(id string, templateId string, name string, value string) {

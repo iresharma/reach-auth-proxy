@@ -35,6 +35,7 @@ func createKanban(c *gin.Context) {
 	}
 	//permArr := strings.Split((*cacheResp)["perm"], ";")
 	res := kanban.CreateKanban(userAccount)
+	redis.DeleteFromRedis("kanban:user:" + userAccount)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -62,6 +63,7 @@ func createLabel(c *gin.Context) {
 	fmt.Println(body)
 	res := kanban.AddLabel(body.Get("board"), body.Get("color"), body.Get("label"))
 	redis.DeleteFromRedis(body.Get("board") + ":Labels")
+	redis.DeleteFromRedis(body.Get("board") + ":export")
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -94,8 +96,18 @@ func GetLabel(c *gin.Context) {
 		return
 	}
 	query := c.Query("label_id")
+	// label ids are unique and there is no update/delete-label endpoint in this file,
+	// so no invalidation call is needed for this key.
+	resCache := redis.GetItemFromRedis("label:" + query)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.Getlabel(query)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis("label:"+query, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func createItem(c *gin.Context) {
@@ -162,8 +174,17 @@ func getItem(c *gin.Context) {
 		return
 	}
 	task_id := c.Query("id")
+	boardId := c.Request.Header.Get("X-Board")
+	resCache := redis.GetItemFromRedis(boardId + ":item:" + task_id)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.GetItem(task_id)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(boardId+":item:"+task_id, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func updateItem(c *gin.Context) {
@@ -215,8 +236,16 @@ func exportKanban(c *gin.Context) {
 		return
 	}
 	boardId := c.Request.Header["X-Board"][0]
+	resCache := redis.GetItemFromRedis(boardId + ":export")
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.ExportBoard(boardId)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(boardId+":export", marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func getKanban(c *gin.Context) {
@@ -227,7 +256,15 @@ func getKanban(c *gin.Context) {
 		return
 	}
 	userAccount := c.Request.Header["X-Useraccount"][0]
-	c.String(http.StatusOK, database.GetKanban(userAccount))
+	key := "kanban:user:" + userAccount
+	if cached, ok := redis.GetStringFromRedis(key); ok {
+		c.Header("X-cache", "HIT")
+		c.String(http.StatusOK, cached)
+		return
+	}
+	result := database.GetKanban(userAccount)
+	redis.AddStringToRedis(key, result)
+	c.String(http.StatusOK, result)
 }
 
 func AddComment(c *gin.Context) {
@@ -247,6 +284,7 @@ func AddComment(c *gin.Context) {
 	body := request.Form
 	log.Println(body.Get("message"))
 	res := kanban.AddComment(body.Get("message"), itemId, userId)
+	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -265,6 +303,7 @@ func UpdateComment(c *gin.Context) {
 	commentId := c.Query("comment_id")
 	body := request.Form
 	res := kanban.UpdateComment(body.Get("message"), commentId)
+	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -282,5 +321,6 @@ func DeleteComment(c *gin.Context) {
 	}
 	commentId := c.Query("comment_id")
 	_ = kanban.DeleteComment(commentId)
+	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
 	c.String(http.StatusOK, "OK")
 }
