@@ -35,6 +35,7 @@ func createKanban(c *gin.Context) {
 	}
 	//permArr := strings.Split((*cacheResp)["perm"], ";")
 	res := kanban.CreateKanban(userAccount)
+	redis.DeleteFromRedis("kanban:" + userAccount)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -94,8 +95,17 @@ func GetLabel(c *gin.Context) {
 		return
 	}
 	query := c.Query("label_id")
+	cacheKey := "label:" + query
+	resCache := redis.GetItemFromRedis(cacheKey)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.Getlabel(query)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(cacheKey, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func createItem(c *gin.Context) {
@@ -162,8 +172,17 @@ func getItem(c *gin.Context) {
 		return
 	}
 	task_id := c.Query("id")
+	cacheKey := "item:" + task_id
+	resCache := redis.GetItemFromRedis(cacheKey)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.GetItem(task_id)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(cacheKey, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func updateItem(c *gin.Context) {
@@ -181,6 +200,7 @@ func updateItem(c *gin.Context) {
 	body := c.Request.Form
 	res := kanban.UpdateItem(body)
 	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
+	redis.DeleteFromRedis("item:" + body.Get("id"))
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -199,6 +219,7 @@ func DeleteItem(c *gin.Context) {
 	body := c.Request.Form.Get("id")
 	kanban.DeleteItem(body)
 	redis.DeleteAllKeysPrefix(c.Request.Header.Get("X-Board"))
+	redis.DeleteFromRedis("item:" + body)
 	c.String(http.StatusOK, "Item deleted")
 }
 
@@ -215,8 +236,17 @@ func exportKanban(c *gin.Context) {
 		return
 	}
 	boardId := c.Request.Header["X-Board"][0]
+	cacheKey := boardId + ":export"
+	resCache := redis.GetItemFromRedis(cacheKey)
+	if resCache != nil {
+		c.Header("X-cache", "HIT")
+		c.JSON(http.StatusOK, resCache)
+		return
+	}
 	res := kanban.ExportBoard(boardId)
-	c.JSON(http.StatusOK, RPC.StructToMap(res))
+	marshalledRes := RPC.StructToMap(res)
+	redis.AddItemToRedis(cacheKey, marshalledRes)
+	c.JSON(http.StatusOK, marshalledRes)
 }
 
 func getKanban(c *gin.Context) {
@@ -227,7 +257,20 @@ func getKanban(c *gin.Context) {
 		return
 	}
 	userAccount := c.Request.Header["X-Useraccount"][0]
-	c.String(http.StatusOK, database.GetKanban(userAccount))
+	cacheKey := "kanban:" + userAccount
+	resCache := redis.GetItemFromRedis(cacheKey)
+	if resCache != nil {
+		if cacheMap, ok := resCache.(map[string]interface{}); ok {
+			if data, ok := cacheMap["data"].(string); ok {
+				c.Header("X-cache", "HIT")
+				c.String(http.StatusOK, data)
+				return
+			}
+		}
+	}
+	res := database.GetKanban(userAccount)
+	redis.AddItemToRedis(cacheKey, map[string]interface{}{"data": res})
+	c.String(http.StatusOK, res)
 }
 
 func AddComment(c *gin.Context) {
@@ -247,6 +290,7 @@ func AddComment(c *gin.Context) {
 	body := request.Form
 	log.Println(body.Get("message"))
 	res := kanban.AddComment(body.Get("message"), itemId, userId)
+	redis.DeleteFromRedis("item:" + itemId)
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -263,8 +307,17 @@ func UpdateComment(c *gin.Context) {
 		return
 	}
 	commentId := c.Query("comment_id")
+	// NOTE: item_id is an optional query param. Neither the Comment/UpdateCommentRequest
+	// proto types nor the underlying RPC layer expose a way to look up which item a
+	// comment belongs to from commentId alone, so we cannot reliably invalidate the
+	// owning item's cache entry server-side. This is a best-effort invalidation until
+	// callers reliably pass item_id or a proper commentId -> itemId lookup exists.
+	itemId := c.Query("item_id")
 	body := request.Form
 	res := kanban.UpdateComment(body.Get("message"), commentId)
+	if itemId != "" {
+		redis.DeleteFromRedis("item:" + itemId)
+	}
 	c.JSON(http.StatusOK, RPC.StructToMap(res))
 }
 
@@ -281,6 +334,15 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 	commentId := c.Query("comment_id")
+	// NOTE: item_id is an optional query param. Neither the VoidResp/DeleteCommentRequest
+	// proto types nor the underlying RPC layer expose a way to look up which item a
+	// comment belongs to from commentId alone, so we cannot reliably invalidate the
+	// owning item's cache entry server-side. This is a best-effort invalidation until
+	// callers reliably pass item_id or a proper commentId -> itemId lookup exists.
+	itemId := c.Query("item_id")
 	_ = kanban.DeleteComment(commentId)
+	if itemId != "" {
+		redis.DeleteFromRedis("item:" + itemId)
+	}
 	c.String(http.StatusOK, "OK")
 }
